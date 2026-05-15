@@ -61,7 +61,7 @@ CL.Target = function(data, cb)
             coords = vec(data.coords.x, data.coords.y, data.coords.z),
             size = data.size,
             debug = false,
-            useZ = true,
+            useZ = false,
             rotation = data.coords.w or 0.0,
             options = {
                 {

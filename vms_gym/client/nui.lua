@@ -1,497 +1,233 @@
-local L0_1, L1_1, L2_1
-L0_1 = RegisterNUICallback
-L1_1 = "loaded"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2
-  L2_2 = SendNUIMessage
-  L3_2 = {}
-  L3_2.action = "loaded"
-  L4_2 = Config
-  L4_2 = L4_2.Language
-  L3_2.lang = L4_2
-  L4_2 = Config
-  L4_2 = L4_2.StatisticsMenu
-  L3_2.statisticsmenu = L4_2
-  L4_2 = Config
-  L4_2 = L4_2.UseBuildInCompanyBalance
-  L3_2.useBuildInBalance = L4_2
-  L4_2 = Config
-  L4_2 = L4_2.RemoveBalanceFromMenu
-  L3_2.removeBalanceFromMenu = L4_2
-  L4_2 = Config
-  L4_2 = L4_2.UseVMSCityHall
-  L3_2.useCityHall = L4_2
-  L4_2 = Config
-  L4_2 = L4_2.UseCityHallResumes
-  L3_2.useCityHallResumes = L4_2
-  L4_2 = Config
-  L4_2 = L4_2.UseCityHallTaxes
-  L3_2.useCityHallTaxes = L4_2
-  L4_2 = Config
-  L4_2 = L4_2.UseCityHallIncludedTaxes
-  L3_2.useCityHallIncludedTaxes = L4_2
-  L4_2 = Config
-  L4_2 = L4_2.UseVMSCityHall
-  if L4_2 then
-    L4_2 = Config
-    L4_2 = L4_2.UseCityHallTaxes
-    if L4_2 then
-      L4_2 = exports
-      L5_2 = Config
-      L5_2 = L5_2.VMSCityHallResource
-      L4_2 = L4_2[L5_2]
-      L5_2 = L4_2
-      L4_2 = L4_2.TaxBusinessAllowMakeDelayedDeclarations
-      L4_2 = L4_2(L5_2)
-      if L4_2 then
-        goto lbl_46
-      end
+-- ============================================================
+--  vms_gym  |  nui.lua  (deobfuscated)
+--  All NUI callbacks bridging the HTML UI → Lua
+-- ============================================================
+
+-- ── loaded ───────────────────────────────────────────────────
+RegisterNUICallback("loaded", function(data, cb)
+    local msg = {
+        action                               = "loaded",
+        lang                                 = Config.Language,
+        statisticsmenu                       = Config.StatisticsMenu,
+        useBuildInBalance                    = Config.UseBuildInCompanyBalance,
+        removeBalanceFromMenu                = Config.RemoveBalanceFromMenu,
+        useCityHall                          = Config.UseVMSCityHall,
+        useCityHallResumes                   = Config.UseCityHallResumes,
+        useCityHallTaxes                     = Config.UseCityHallTaxes,
+        useCityHallIncludedTaxes             = Config.UseCityHallIncludedTaxes,
+        taxBusinessAllowMakeDelayedDeclarations = nil,
+        taxBusinessPercentagePerMonthForDelay   = nil,
+    }
+
+    if Config.UseVMSCityHall and Config.UseCityHallTaxes then
+        local exp = exports[Config.VMSCityHallResource]
+        msg.taxBusinessAllowMakeDelayedDeclarations = exp:TaxBusinessAllowMakeDelayedDeclarations() or nil
+        msg.taxBusinessPercentagePerMonthForDelay   = exp:TaxBusinessPercentagePerMonthForDelay()   or nil
     end
-  end
-  L4_2 = nil
-  ::lbl_46::
-  L3_2.taxBusinessAllowMakeDelayedDeclarations = L4_2
-  L4_2 = Config
-  L4_2 = L4_2.UseVMSCityHall
-  if L4_2 then
-    L4_2 = Config
-    L4_2 = L4_2.UseCityHallTaxes
-    if L4_2 then
-      L4_2 = exports
-      L5_2 = Config
-      L5_2 = L5_2.VMSCityHallResource
-      L4_2 = L4_2[L5_2]
-      L5_2 = L4_2
-      L4_2 = L4_2.TaxBusinessPercentagePerMonthForDelay
-      L4_2 = L4_2(L5_2)
-      if L4_2 then
-        goto lbl_64
-      end
+
+    SendNUIMessage(msg)
+    cb({})
+end)
+
+-- ── notifyStatus ─────────────────────────────────────────────
+RegisterNUICallback("notifyStatus", function(data, cb)
+    disabledNotifySkillInfo = tonumber(data.status)
+    cb({})
+end)
+
+-- ── closeStatisticsMenu ───────────────────────────────────────
+RegisterNUICallback("closeStatisticsMenu", function(data, cb)
+    SetNuiFocus(false, false)
+    SendNUIMessage({ action = "closeStatisticsMenu" })
+    cb({})
+end)
+
+-- ── closePurchaseMenu ─────────────────────────────────────────
+RegisterNUICallback("closePurchaseMenu", function(data, cb)
+    currentShop = nil
+    SetNuiFocus(false, false)
+    SendNUIMessage({ action = "closePurchaseMenu" })
+    cb({})
+end)
+
+-- ── buyProtein ────────────────────────────────────────────────
+RegisterNUICallback("buyProtein", function(data, cb)
+    buyProtein(data.name)
+    cb({})
+end)
+
+-- ── buyMembership ─────────────────────────────────────────────
+RegisterNUICallback("buyMembership", function(data, cb)
+    buyMembership(data.days, data.hours)
+    cb({})
+end)
+
+-- ── closeMenu / closeManagementMenu ──────────────────────────
+RegisterNUICallback("closeMenu", function(data, cb)
+    closeManagementMenu()
+    cb({})
+end)
+
+RegisterNUICallback("closeManagementMenu", function(data, cb)
+    closeManagementMenu()
+    cb({})
+end)
+
+-- ── sendAnnouncement ──────────────────────────────────────────
+RegisterNUICallback("sendAnnouncement", function(data, cb)
+    if data.text and data.text ~= "" then
+        TriggerServerEvent("vms_gym:sendAnnouncement", currentGymManagement, data.text)
     end
-  end
-  L4_2 = nil
-  ::lbl_64::
-  L3_2.taxBusinessPercentagePerMonthForDelay = L4_2
-  L2_2(L3_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "notifyStatus"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2
-  L2_2 = tonumber
-  L3_2 = A0_2.status
-  L2_2 = L2_2(L3_2)
-  disabledNotifySkillInfo = L2_2
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "closeStatisticsMenu"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2
-  L2_2 = SetNuiFocus
-  L3_2 = false
-  L4_2 = false
-  L2_2(L3_2, L4_2)
-  L2_2 = SendNUIMessage
-  L3_2 = {}
-  L3_2.action = "closeStatisticsMenu"
-  L2_2(L3_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "closePurchaseMenu"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2
-  currentShop = nil
-  L2_2 = SetNuiFocus
-  L3_2 = false
-  L4_2 = false
-  L2_2(L3_2, L4_2)
-  L2_2 = SendNUIMessage
-  L3_2 = {}
-  L3_2.action = "closePurchaseMenu"
-  L2_2(L3_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "buyProtein"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2
-  L2_2 = buyProtein
-  L3_2 = A0_2.name
-  L2_2(L3_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "buyMembership"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2
-  L2_2 = buyMembership
-  L3_2 = A0_2.days
-  L4_2 = A0_2.hours
-  L2_2(L3_2, L4_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "closeMenu"
-function L2_1(A0_2, A1_2)
-  local L2_2
-  L2_2 = closeManagementMenu
-  L2_2()
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "closeManagementMenu"
-function L2_1(A0_2, A1_2)
-  local L2_2
-  L2_2 = closeManagementMenu
-  L2_2()
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "sendAnnouncement"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2
-  L2_2 = A0_2.text
-  if L2_2 then
-    L2_2 = TriggerServerEvent
-    L3_2 = "vms_gym:sendAnnouncement"
-    L4_2 = currentGymManagement
-    L5_2 = A0_2.text
-    L2_2(L3_2, L4_2, L5_2)
-  end
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "getClosestPlayers"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2
-  L2_2 = currentGymManagement
-  if not L2_2 then
-    return
-  end
-  L2_2 = CL
-  L2_2 = L2_2.GetClosestPlayers
-  L2_2 = L2_2()
-  L3_2 = {}
-  if not L2_2 then
-    L4_2 = Config
-    L4_2 = L4_2.Notification
-    L5_2 = TRANSLATE
-    L6_2 = "notify.employees:no_players_around"
-    L5_2 = L5_2(L6_2)
-    L6_2 = 3000
-    L7_2 = "error"
-    L4_2(L5_2, L6_2, L7_2)
-    return
-  end
-  L4_2 = pairs
-  L5_2 = L2_2
-  L4_2, L5_2, L6_2, L7_2 = L4_2(L5_2)
-  for L8_2, L9_2 in L4_2, L5_2, L6_2, L7_2 do
-    L10_2 = #L3_2
-    L10_2 = L10_2 + 1
-    L11_2 = GetPlayerServerId
-    L12_2 = L9_2
-    L11_2 = L11_2(L12_2)
-    L3_2[L10_2] = L11_2
-  end
-  L4_2 = SendNUIMessage
-  L5_2 = {}
-  L5_2.action = "updateManagementMenu"
-  L5_2.players = L3_2
-  L4_2(L5_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "hireEmployee"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2
-  L2_2 = currentGymManagement
-  if not L2_2 then
-    return
-  end
-  L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:hireAnEmployee"
-  L4_2 = currentGymManagement
-  L5_2 = A0_2.playerId
-  L2_2(L3_2, L4_2, L5_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "bonusEmployee"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2, L6_2
-  L2_2 = currentGymManagement
-  if not L2_2 then
-    return
-  end
-  L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:bonusEmployee"
-  L4_2 = currentGymManagement
-  L5_2 = A0_2.identifier
-  L6_2 = A0_2.bonusMoney
-  L2_2(L3_2, L4_2, L5_2, L6_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "changeGradeEmployee"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2, L6_2
-  L2_2 = currentGymManagement
-  if not L2_2 then
-    return
-  end
-  L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:changeGradeEmployee"
-  L4_2 = currentGymManagement
-  L5_2 = A0_2.identifier
-  L6_2 = A0_2.grade
-  L2_2(L3_2, L4_2, L5_2, L6_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "fireEmployee"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2
-  L2_2 = currentGymManagement
-  if not L2_2 then
-    return
-  end
-  L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:fireEmployee"
-  L4_2 = currentGymManagement
-  L5_2 = A0_2.identifier
-  L2_2(L3_2, L4_2, L5_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "withdraw"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2, L6_2
-  L2_2 = currentGymManagement
-  if not L2_2 then
-    return
-  end
-  L2_2 = tonumber
-  L3_2 = A0_2.money
-  L2_2 = L2_2(L3_2)
-  if L2_2 then
-    L2_2 = tonumber
-    L3_2 = A0_2.money
-    L2_2 = L2_2(L3_2)
-    if L2_2 >= 1 then
-      L2_2 = Config
-      L2_2 = L2_2.UseBuildInCompanyBalance
-      if not L2_2 then
-        L2_2 = TriggerServerEvent
-        L3_2 = Config
-        L3_2 = L3_2.ESXSocietyEvents
-        L3_2 = L3_2.withdraw
-        L4_2 = Config
-        L4_2 = L4_2.Gyms
-        L5_2 = currentGymManagement
-        L4_2 = L4_2[L5_2]
-        L4_2 = L4_2.ownerJob
-        L5_2 = tonumber
-        L6_2 = A0_2.money
-        L5_2, L6_2 = L5_2(L6_2)
-        L2_2(L3_2, L4_2, L5_2, L6_2)
-      else
-        L2_2 = TriggerServerEvent
-        L3_2 = "vms_gym:withdraw"
-        L4_2 = currentGymManagement
-        L5_2 = tonumber
-        L6_2 = A0_2.money
-        L5_2, L6_2 = L5_2(L6_2)
-        L2_2(L3_2, L4_2, L5_2, L6_2)
-      end
+    cb({})
+end)
+
+-- ── getClosestPlayers ─────────────────────────────────────────
+RegisterNUICallback("getClosestPlayers", function(data, cb)
+    if not currentGymManagement then cb({}); return end
+
+    local nearbyPeds = CL.GetClosestPlayers()
+    if not nearbyPeds then
+        Config.Notification(
+            TRANSLATE("notify.employees:no_players_around"),
+            3000, "error"
+        )
+        cb({}); return
     end
-  end
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "deposit"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2, L6_2
-  L2_2 = currentGymManagement
-  if not L2_2 then
-    return
-  end
-  L2_2 = tonumber
-  L3_2 = A0_2.money
-  L2_2 = L2_2(L3_2)
-  if L2_2 then
-    L2_2 = tonumber
-    L3_2 = A0_2.money
-    L2_2 = L2_2(L3_2)
-    if L2_2 >= 1 then
-      L2_2 = Config
-      L2_2 = L2_2.UseBuildInCompanyBalance
-      if not L2_2 then
-        L2_2 = TriggerServerEvent
-        L3_2 = Config
-        L3_2 = L3_2.ESXSocietyEvents
-        L3_2 = L3_2.deposit
-        L4_2 = Config
-        L4_2 = L4_2.Gyms
-        L5_2 = currentGymManagement
-        L4_2 = L4_2[L5_2]
-        L4_2 = L4_2.ownerJob
-        L5_2 = tonumber
-        L6_2 = A0_2.money
-        L5_2, L6_2 = L5_2(L6_2)
-        L2_2(L3_2, L4_2, L5_2, L6_2)
-      else
-        L2_2 = TriggerServerEvent
-        L3_2 = "vms_gym:deposit"
-        L4_2 = currentGymManagement
-        L5_2 = tonumber
-        L6_2 = A0_2.money
-        L5_2, L6_2 = L5_2(L6_2)
-        L2_2(L3_2, L4_2, L5_2, L6_2)
-      end
+
+    local playerIds = {}
+    for _, ped in pairs(nearbyPeds) do
+        table.insert(playerIds, GetPlayerServerId(ped))
     end
-  end
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "getClosestPlayersForMembership"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2
-  L2_2 = CL
-  L2_2 = L2_2.GetClosestPlayers
-  L2_2 = L2_2()
-  L3_2 = {}
-  L4_2 = pairs
-  L5_2 = L2_2
-  L4_2, L5_2, L6_2, L7_2 = L4_2(L5_2)
-  for L8_2, L9_2 in L4_2, L5_2, L6_2, L7_2 do
-    if L9_2 then
-      L10_2 = #L3_2
-      L10_2 = L10_2 + 1
-      L11_2 = GetPlayerServerId
-      L12_2 = L9_2
-      L11_2 = L11_2(L12_2)
-      L3_2[L10_2] = L11_2
+
+    SendNUIMessage({ action = "updateManagementMenu", players = playerIds })
+    cb({})
+end)
+
+-- ── hireEmployee ─────────────────────────────────────────────
+RegisterNUICallback("hireEmployee", function(data, cb)
+    if not currentGymManagement then cb({}); return end
+    TriggerServerEvent("vms_gym:hireAnEmployee", currentGymManagement, data.playerId)
+    cb({})
+end)
+
+-- ── bonusEmployee ─────────────────────────────────────────────
+RegisterNUICallback("bonusEmployee", function(data, cb)
+    if not currentGymManagement then cb({}); return end
+    TriggerServerEvent("vms_gym:bonusEmployee", currentGymManagement, data.identifier, data.bonusMoney)
+    cb({})
+end)
+
+-- ── changeGradeEmployee ───────────────────────────────────────
+RegisterNUICallback("changeGradeEmployee", function(data, cb)
+    if not currentGymManagement then cb({}); return end
+    TriggerServerEvent("vms_gym:changeGradeEmployee", currentGymManagement, data.identifier, data.grade)
+    cb({})
+end)
+
+-- ── fireEmployee ─────────────────────────────────────────────
+RegisterNUICallback("fireEmployee", function(data, cb)
+    if not currentGymManagement then cb({}); return end
+    TriggerServerEvent("vms_gym:fireEmployee", currentGymManagement, data.identifier)
+    cb({})
+end)
+
+-- ── withdraw ──────────────────────────────────────────────────
+RegisterNUICallback("withdraw", function(data, cb)
+    if not currentGymManagement then cb({}); return end
+    local amount = tonumber(data.money)
+    if not amount or amount < 1 then cb({}); return end
+
+    if not Config.UseBuildInCompanyBalance then
+        TriggerServerEvent(
+            Config.ESXSocietyEvents.withdraw,
+            Config.Gyms[currentGymManagement].ownerJob,
+            amount
+        )
+    else
+        TriggerServerEvent("vms_gym:withdraw", currentGymManagement, amount)
     end
-  end
-  L4_2 = A1_2
-  L5_2 = L3_2
-  L4_2(L5_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "sellMembership"
-function L2_1(A0_2)
-  local L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2
-  L1_2 = currentGymManagement
-  if not L1_2 then
-    return
-  end
-  L1_2 = Config
-  L1_2 = L1_2.Gyms
-  L2_2 = currentGymManagement
-  L1_2 = L1_2[L2_2]
-  L2_2 = L1_2.requiredMembership
-  if not L2_2 then
-    return
-  end
-  L2_2 = L1_2.allowSellMembership
-  if not L2_2 then
-    return
-  end
-  L2_2 = nil
-  L3_2 = pairs
-  L4_2 = L1_2.memberships
-  L3_2, L4_2, L5_2, L6_2 = L3_2(L4_2)
-  for L7_2, L8_2 in L3_2, L4_2, L5_2, L6_2 do
-    L9_2 = L8_2.days
-    L10_2 = A0_2.days
-    if L9_2 == L10_2 then
-      L9_2 = L8_2.hours
-      L10_2 = A0_2.hours
-      if L9_2 == L10_2 then
-        L2_2 = L8_2
-        break
-      end
+    cb({})
+end)
+
+-- ── deposit ───────────────────────────────────────────────────
+RegisterNUICallback("deposit", function(data, cb)
+    if not currentGymManagement then cb({}); return end
+    local amount = tonumber(data.money)
+    if not amount or amount < 1 then cb({}); return end
+
+    if not Config.UseBuildInCompanyBalance then
+        TriggerServerEvent(
+            Config.ESXSocietyEvents.deposit,
+            Config.Gyms[currentGymManagement].ownerJob,
+            amount
+        )
+    else
+        TriggerServerEvent("vms_gym:deposit", currentGymManagement, amount)
     end
-  end
-  if not L2_2 then
-    return
-  end
-  L3_2 = TriggerServerEvent
-  L4_2 = "vms_gym:sv:sellMembership"
-  L5_2 = A0_2.playerId
-  L6_2 = currentGymManagement
-  L7_2 = L2_2
-  L3_2(L4_2, L5_2, L6_2, L7_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "sellProtein"
-function L2_1(A0_2)
-  local L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2
-  L1_2 = currentGymManagement
-  if not L1_2 then
-    return
-  end
-  L1_2 = Config
-  L1_2 = L1_2.Gyms
-  L2_2 = currentGymManagement
-  L1_2 = L1_2[L2_2]
-  L2_2 = L1_2.allowSellProteins
-  if not L2_2 then
-    return
-  end
-  L2_2 = L1_2.proteins
-  if not L2_2 then
-    return
-  end
-  L2_2 = L1_2.proteins
-  L3_2 = A0_2.name
-  L2_2 = L2_2[L3_2]
-  if not L2_2 then
-    return
-  end
-  L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:sv:sellProtein"
-  L4_2 = A0_2.playerId
-  L5_2 = currentGymManagement
-  L6_2 = L1_2.proteins
-  L7_2 = A0_2.name
-  L6_2 = L6_2[L7_2]
-  L7_2 = A0_2.count
-  L2_2(L3_2, L4_2, L5_2, L6_2, L7_2)
-end
-L0_1(L1_1, L2_1)
-L0_1 = RegisterNUICallback
-L1_1 = "bill"
-function L2_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2
-  L2_2 = A0_2.action
-  if "pay" == L2_2 then
-    L2_2 = TriggerServerEvent
-    L3_2 = "vms_gym:sv:payBill"
-    L4_2 = "pay"
-    L5_2 = A0_2.type
-    L2_2(L3_2, L4_2, L5_2)
-  else
-    L2_2 = TriggerServerEvent
-    L3_2 = "vms_gym:sv:payBill"
-    L4_2 = "cancel"
-    L2_2(L3_2, L4_2)
-    L2_2 = SetNuiFocus
-    L3_2 = false
-    L4_2 = false
-    L2_2(L3_2, L4_2)
-    L2_2 = SendNUIMessage
-    L3_2 = {}
-    L3_2.action = "closeReceipt"
-    L2_2(L3_2)
-    L2_2 = {}
-    billCache = L2_2
-  end
-end
-L0_1(L1_1, L2_1)
+    cb({})
+end)
+
+-- ── getClosestPlayersForMembership ────────────────────────────
+RegisterNUICallback("getClosestPlayersForMembership", function(data, cb)
+    local nearbyPeds = CL.GetClosestPlayers()
+    local playerIds  = {}
+    if nearbyPeds then
+        for _, ped in pairs(nearbyPeds) do
+            if ped then
+                table.insert(playerIds, GetPlayerServerId(ped))
+            end
+        end
+    end
+    cb(playerIds)
+end)
+
+-- ── sellMembership ────────────────────────────────────────────
+RegisterNUICallback("sellMembership", function(data, cb)
+    if not currentGymManagement then cb({}); return end
+
+    local gymCfg = Config.Gyms[currentGymManagement]
+    if not gymCfg then cb({}); return end
+    if not gymCfg.requiredMembership then cb({}); return end
+    if not gymCfg.allowSellMembership then cb({}); return end
+
+    -- Find matching membership
+    local found = nil
+    for _, m in pairs(gymCfg.memberships) do
+        if m.days == data.days and m.hours == data.hours then
+            found = m; break
+        end
+    end
+    if not found then cb({}); return end
+
+    TriggerServerEvent("vms_gym:sv:sellMembership", data.playerId, currentGymManagement, found)
+    cb({})
+end)
+
+-- ── sellProtein ───────────────────────────────────────────────
+RegisterNUICallback("sellProtein", function(data, cb)
+    if not currentGymManagement then cb({}); return end
+
+    local gymCfg = Config.Gyms[currentGymManagement]
+    if not gymCfg then cb({}); return end
+    if not gymCfg.allowSellProteins then cb({}); return end
+    if not gymCfg.proteins then cb({}); return end
+
+    local protein = gymCfg.proteins[data.name]
+    if not protein then cb({}); return end
+
+    TriggerServerEvent("vms_gym:sv:sellProtein", data.playerId, currentGymManagement, protein, data.count)
+    cb({})
+end)
+
+-- ── bill ─────────────────────────────────────────────────────
+RegisterNUICallback("bill", function(data, cb)
+    if data.action == "pay" then
+        TriggerServerEvent("vms_gym:sv:payBill", "pay", data.type)
+    else
+        TriggerServerEvent("vms_gym:sv:payBill", "cancel")
+        SetNuiFocus(false, false)
+        SendNUIMessage({ action = "closeReceipt" })
+        billCache = {}
+    end
+    cb({})
+end)
