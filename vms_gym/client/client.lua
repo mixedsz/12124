@@ -563,7 +563,7 @@ function startAction(gymId, pointIndex, point)
                 pl[1]+0.0, pl[2]+0.0, pl[3]+0.0,
                 pl[4]+0.0, pl[5]+0.0, pl[6]+0.0,
                 true, true, false, false, 1, true)
-            SetModelAsNoLongerNeeded(propObj)
+            SetModelAsNoLongerNeeded(GetHashKey(point.prop.name))
         end
 
         -- Attach prop 2
@@ -577,7 +577,7 @@ function startAction(gymId, pointIndex, point)
                 pl[1]+0.0, pl[2]+0.0, pl[3]+0.0,
                 pl[4]+0.0, pl[5]+0.0, pl[6]+0.0,
                 true, true, false, false, 1, true)
-            SetModelAsNoLongerNeeded(propObj)
+            SetModelAsNoLongerNeeded(GetHashKey(point.prop2.name))
         end
 
         -- Main training loop
