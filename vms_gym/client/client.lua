@@ -361,13 +361,13 @@ function L10_1(A0_2, A1_2, A2_2)
         L6_2 = A2_2.value
         L4_2[L5_2] = L6_2
         goto lbl_74
-        ::lbl_34::
-        L4_2 = stores
-        L4_2 = L4_2[A0_2]
-        L5_2 = A2_2.sub
-        L6_2 = A2_2.value
-        L4_2[L5_2] = L6_2
       end
+      ::lbl_34::
+      L4_2 = stores
+      L4_2 = L4_2[A0_2]
+      L5_2 = A2_2.sub
+      L6_2 = A2_2.value
+      L4_2[L5_2] = L6_2
     else
       L4_2 = pairs
       L5_2 = A2_2
