@@ -58,6 +58,13 @@ Config.TargetResource = 'ox_target' -- 'ox_target' / 'qb-target'
 ---@field EnableMemberships: If you use in any gym the required membership, run it then it will work correctly reading memberships
 Config.EnableMemberships = true
 
+-- UI accent color — change r/g/b to theme the entire purchase/management UI
+Config.UIColor = {
+    r = 87,
+    g = 60,
+    b = 250,
+}
+
 -- @EnableStrengthModifier: In the config.client.lua file, you can modify the player's hitting power with certain power stats.
 -- !!! IF YOUR ANTI-CHEAT BANS FOR strength MODIFICATION YOU NEED TO SET THIS OPTION TO FALSE OR MAKE A CHANGE IN THE ANTI-CHEAT !!!
 Config.EnableStrengthModifier = true
@@ -247,8 +254,8 @@ Config.Gyms = {
         },
 
         shopMenu = {
-            coords = vector3(-515.53, -606.77, 34.71),
-            targetCoords = vector4(-515.53, -606.77, 34.71, 3),
+            coords = vector3(-515.5427, -606.4371, 34.6287),
+            targetCoords = vector4(-515.5427, -606.4371, 34.6287, 3),
             targetSize = vec(1.95, 0.65, 3.0),
         },
 
@@ -265,7 +272,7 @@ Config.Gyms = {
             {days = 31, price = 25000},
         },
 
-        allowBuyProteins = false,
+        allowBuyProteins = true,
         allowSellProteins = false,
         proteins = {
             ['protein'] = {

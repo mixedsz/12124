@@ -457,10 +457,12 @@ Citizen.CreateThread(function()
                 if distance < Config.DistanceView then
                     sleep = false
                     if Config.UseMarkers then
-                        DrawMarker(Config.Markers['ShopMenu'].id, v.shopMenu.coords.xyz, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Config.Markers['ShopMenu'].size, Config.Markers['ShopMenu'].color[1], Config.Markers['ShopMenu'].color[2], Config.Markers['ShopMenu'].color[3], Config.Markers['ShopMenu'].color[4], Config.Markers['ShopMenu'].bobUpAndDown, false, false, Config.Markers['ShopMenu'].rotate, false, false, false)
+                        -- Offset z by +0.05 to prevent z-fighting with the floor surface
+                        local mc = v.shopMenu.coords
+                        DrawMarker(Config.Markers['ShopMenu'].id, vec(mc.x, mc.y, mc.z + 0.05), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Config.Markers['ShopMenu'].size, Config.Markers['ShopMenu'].color[1], Config.Markers['ShopMenu'].color[2], Config.Markers['ShopMenu'].color[3], Config.Markers['ShopMenu'].color[4], Config.Markers['ShopMenu'].bobUpAndDown, false, false, Config.Markers['ShopMenu'].rotate, false, false, false)
                     end
                     if Config.Use3DText then
-                        DrawText3D(v.bossMenu.coords.x, v.bossMenu.coords.y, v.bossMenu.coords.z, TRANSLATE("3dtext.shop_menu"))
+                        DrawText3D(v.shopMenu.coords.x, v.shopMenu.coords.y, v.shopMenu.coords.z, TRANSLATE("3dtext.shop_menu"))
                     end
                     if distance < Config.DistanceAccess then
                         inRange = TRANSLATE("textui.shop_menu")
@@ -668,26 +670,32 @@ startAction = function(gymId, pointId, pointTable)
 end
 
 stopAction = function()
-    if Config.Animations[_pointTable.name].exit then
-        TaskPlayAnim(PlayerPedId(), Config.Animations[_pointTable.name].exit[1], Config.Animations[_pointTable.name].exit[2], 8.0, -8.0, Config.Animations[_pointTable.name].exit[3], 0, 0.0, 0, 0, 0)
-        Citizen.Wait(Config.Animations[_pointTable.name].exit[3])
-    else
-        ClearPedTasks(PlayerPedId())
-    end
+    -- Capture exit anim before clearing state so loops stop immediately
+    local exitAnim = Config.Animations[_pointTable.name] and Config.Animations[_pointTable.name].exit
+
+    -- Stop current animation and free the player instantly
+    ClearPedTasks(PlayerPedId())
     FreezeEntityPosition(PlayerPedId(), false)
     SetEntityCollision(PlayerPedId(), true, true)
+
     TriggerServerEvent('vms_gym:sv:setTaken', _gymId, _pointId, false)
     SendNUIMessage({action = 'closeHelpKeys'})
-    if myProp then
-        DeleteObject(myProp)
-    end
-    if myProp2 then
-        DeleteObject(myProp2)
-    end
+
+    if myProp then DeleteObject(myProp) end
+    if myProp2 then DeleteObject(myProp2) end
+
     removeStrength = true
     _gymId, _pointId, _pointTable = nil, nil, nil
     myProp = nil
     myProp2 = nil
+
+    -- Play exit animation as a non-blocking cosmetic after cleanup
+    if exitAnim then
+        TaskPlayAnim(PlayerPedId(), exitAnim[1], exitAnim[2], 8.0, -8.0, exitAnim[3], 0, 0.0, 0, 0, 0)
+        Citizen.SetTimeout(exitAnim[3], function()
+            ClearPedTasks(PlayerPedId())
+        end)
+    end
 end
 
 function addSkill(name, value)

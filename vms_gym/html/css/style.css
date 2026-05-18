@@ -1,4 +1,14 @@
 :root {
+    --ui-r: 87;
+    --ui-g: 60;
+    --ui-b: 250;
+    --ui-r-mid: 69;
+    --ui-g-mid: 46;
+    --ui-b-mid: 199;
+    --ui-r-dark: 41;
+    --ui-g-dark: 21;
+    --ui-b-dark: 156;
+
     --primary-text-color: #e7e7e7;
     --secondary-text-color: #94a1b2;
 
@@ -319,240 +329,372 @@ body {
 
 
 
-/* 
-    PAPERS MENU
-*/
+/* ─── PURCHASE MENU ───────────────────────────────────────── */
 .purchase-menu {
     display: none;
     position: absolute;
     z-index: 0;
-    /* display: flex; */
     justify-content: center;
     align-items: center;
     width: 100%;
     height: 100%;
 }
 
-.purchase-menu>div {
+.purchase-menu > div {
     display: none;
     position: relative;
-    width: 30em;
-    height: 39em;
-    border-radius: 0.5em;
-    background: var(--menu-background);
+    width: 34em;
+    height: 44em;
+    border-radius: 1em;
+    background: #0b0b13;
     color: white;
     overflow: hidden;
-    box-shadow: 0px 0px 4em #0d0d0d8c;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.75), 0 0 60px rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.12);
     animation: scaleIn 0.2s;
+    border: 1px solid rgba(255,255,255,0.055);
 }
 
-.purchase-menu>div::before,
-.purchase-menu>div::after {
+.purchase-menu > div::before {
     content: "";
     position: absolute;
-    width: 70rem;
-    height: 50rem;
+    width: 28em;
+    height: 28em;
     border-radius: 50%;
-    opacity: .1;
+    opacity: 0.1;
     z-index: 0;
-    background: radial-gradient(var(--main-color) 10%, transparent 70%);
+    background: radial-gradient(circle, rgb(var(--ui-r),var(--ui-g),var(--ui-b)) 0%, transparent 70%);
+    top: -12em;
+    right: -8em;
+    pointer-events: none;
 }
 
-.purchase-menu>div::before {
-    transform: translate(-50%, -50%);
-    top: 0rem;
-    left: 10em;
+.purchase-menu > div::after {
+    content: "";
+    position: absolute;
+    width: 18em;
+    height: 18em;
+    border-radius: 50%;
+    opacity: 0.07;
+    z-index: 0;
+    background: radial-gradient(circle, rgb(var(--ui-r),var(--ui-g),var(--ui-b)) 0%, transparent 70%);
+    bottom: -6em;
+    left: -4em;
+    pointer-events: none;
 }
 
-.purchase-menu>div::after {
-    transform: translate(50%, 50%);
-    bottom: 0rem;
-    right: 10em;
-}
-
-.purchase-menu>div>.header {
+/* ── Header ── */
+.purchase-menu > div > .header {
     position: relative;
     z-index: 500;
     display: flex;
     align-items: center;
-    gap: 1em;
-    background: rgba(0, 0, 0, 0.4);
-    height: 3.5em;
-    padding-inline: 1.0em;
+    gap: 0.6em;
+    background: linear-gradient(135deg, rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.28) 0%, rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.06) 100%);
+    border-bottom: 1px solid rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.22);
+    height: 4.2em;
+    padding-inline: 1.2em;
+}
+
+.purchase-menu .pm-icon {
+    width: 2.1em;
+    height: 2.1em;
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.28);
+    border: 1px solid rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.45);
+    border-radius: 0.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a78bfa;
+    font-size: 0.9em;
+    flex-shrink: 0;
 }
 
 .purchase-menu .header .memberships,
 .purchase-menu .header .proteins {
-    width: 8em;
-    background: var(--main-color);
-}
-
-.purchase-menu .header .memberships:not(.active):hover,
-.purchase-menu .header .proteins:not(.active):hover {
-    background: var(--main-color-hover);
-}
-
-.purchase-menu .header .memberships:active,
-.purchase-menu .header .proteins:active {
-    background: var(--main-color-active);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    width: auto;
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    padding: 0.42em 1.1em;
+    border-radius: 2em;
+    color: rgba(255,255,255,0.45);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .purchase-menu .header .memberships.active,
 .purchase-menu .header .proteins.active {
-    background: var(--main-color-active);
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.45);
+    color: rgba(255,255,255,0.95);
+    border-color: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.6);
 }
 
-.purchase-menu .header .memberships,
-.purchase-menu .header .proteins,
-.purchase-menu>div>.header .close {
+.purchase-menu .header .memberships:not(.active):hover,
+.purchase-menu .header .proteins:not(.active):hover {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.75);
+    border-color: rgba(255,255,255,0.14);
+}
+
+.purchase-menu > div > .header .close {
+    width: 2em;
+    height: 2em;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 2em;
-    border-radius: 0.4em;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 0.45em;
     cursor: pointer;
-    transition: 0.3s;
-}
-
-.purchase-menu>div>.header .close {
-    width: 2em;
-    background: var(--back-btn-color);
+    transition: all 0.2s;
     margin-left: auto;
+    color: rgba(255,255,255,0.45);
+    font-size: 0.85em;
 }
 
-.purchase-menu>div>.header .close:hover {
-    background: var(--back-btn-color-hover);
+.purchase-menu > div > .header .close:hover {
+    background: rgba(219,40,40,0.28);
+    border-color: rgba(219,40,40,0.45);
+    color: rgba(255,255,255,0.9);
 }
 
-.purchase-menu>div>.memberships-menu {
+.purchase-menu > div > .header .close:active {
+    background: rgba(219,40,40,0.55);
+}
+
+/* ── Memberships content ── */
+.purchase-menu > div > .memberships-menu {
     position: relative;
     z-index: 50000;
-    padding: 1em;
-    background: var(--submenu-background);
-    margin: 1em;
-    border-radius: 0.5em;
-    height: 33.5em;
-    overflow: auto;
+    padding: 1.1em;
+    background: transparent;
+    margin: 0;
+    border-radius: 0;
+    height: 37.8em;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-.purchase-menu>div>.proteins-menu {
-    gap: 1em;
+.purchase-menu > div > .memberships-menu .current-membership {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.85em 1.1em;
+    border-radius: 0.65em;
+    font-size: 0.87em;
+    font-weight: 500;
+    margin-bottom: 1em;
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.09);
+    border: 1px solid rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.22);
+    color: #b4a8f8;
+}
+
+.purchase-menu > div > .memberships-menu .current-membership.has-membership {
+    background: rgba(34,197,94,0.07);
+    border-color: rgba(34,197,94,0.22);
+    color: #86efac;
+}
+
+.purchase-menu > div > .memberships-menu .current-membership i {
+    font-size: 1em;
+    flex-shrink: 0;
+}
+
+.purchase-menu > div > .memberships-menu hr {
+    display: none;
+}
+
+.purchase-menu > div > .memberships-menu .list {
+    display: grid;
+    gap: 0.5em;
+}
+
+.purchase-menu > div > .memberships-menu .list > div {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 0.65em;
+    padding: 0.75em 1em;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.purchase-menu > div > .memberships-menu .list > div::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.9), rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.35));
+    border-radius: 3px 0 0 3px;
+    opacity: 0.55;
+    transition: opacity 0.2s, width 0.2s;
+}
+
+.purchase-menu > div > .memberships-menu .list > div:hover {
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.1);
+    border-color: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.28);
+    box-shadow: 0 4px 20px rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.14);
+}
+
+.purchase-menu > div > .memberships-menu .list > div:hover::before {
+    opacity: 1;
+    width: 4px;
+}
+
+.purchase-menu .tier-icon {
+    width: 2em;
+    height: 2em;
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.18);
+    border: 1px solid rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.3);
+    border-radius: 0.45em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a78bfa;
+    font-size: 0.78em;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.purchase-menu > div > .memberships-menu .list > div:hover .tier-icon {
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.3);
+}
+
+.purchase-menu > div > .memberships-menu .list > div .time > p {
+    font-size: 0.92em;
+    font-weight: 600;
+    color: #ddd8ff;
+    line-height: 1;
+}
+
+.purchase-menu > div > .memberships-menu .list > div .purchase-btn {
+    margin-left: auto;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.purchase-menu > div > .memberships-menu .list > div .purchase-btn > p {
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.45);
+    border: 1px solid rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.6);
+    border-radius: 2em;
+    padding: 0.36em 1.05em;
+    font-size: 0.82em;
+    font-weight: 700;
+    color: #e8e4ff;
+    transition: all 0.2s;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.purchase-menu > div > .memberships-menu .list > div:hover .purchase-btn > p {
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.72);
+    border-color: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.85);
+    box-shadow: 0 3px 12px rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.38);
+    transform: translateY(-1px);
+}
+
+.purchase-menu > div > .memberships-menu .list > div .purchase-btn:active > p {
+    background: rgba(var(--ui-r-dark),var(--ui-g-dark),var(--ui-b-dark),0.8);
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* ── Proteins menu ── */
+.purchase-menu > div > .proteins-menu {
+    gap: 0.6em;
     display: grid;
     grid-template-rows: min-content;
     position: relative;
     z-index: 50000;
-    padding: 1em;
-    background: var(--submenu-background);
-    margin: 1em;
-    border-radius: 0.5em;
-    height: 33.5em;
-    overflow: auto;
+    padding: 1.1em;
+    background: transparent;
+    margin: 0;
+    border-radius: 0;
+    height: 37.8em;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-.purchase-menu>div>.proteins-menu>div {
+.purchase-menu > div > .proteins-menu > div {
     display: flex;
     align-items: center;
-    gap: 0.5em;
-    background: #c3c3c31f;
-    border-radius: 0.4em;
-    padding: 1em;
-    height: 6em;
+    gap: 0.75em;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 0.65em;
+    padding: 0.9em 1.1em;
+    height: auto;
+    transition: background 0.2s, border-color 0.2s;
 }
 
-.purchase-menu>div>.proteins-menu>div>.image {
-    width: 4em;
-    height: 4em;
-    min-width: 4em;
-    margin-right: 1em;
+.purchase-menu > div > .proteins-menu > div:hover {
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.1);
+    border-color: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.28);
 }
 
-.purchase-menu>div>.proteins-menu>div>.image>img {
+.purchase-menu > div > .proteins-menu > div > .image {
+    width: 3.5em;
+    height: 3.5em;
+    min-width: 3.5em;
+    margin-right: 0.5em;
+}
+
+.purchase-menu > div > .proteins-menu > div > .image > img {
     width: 100%;
     rotate: 25deg;
 }
 
-.purchase-menu>div>.proteins-menu>div>.informations {
+.purchase-menu > div > .proteins-menu > div > .informations {
     width: 100%;
     line-height: 1.2;
 }
 
-.purchase-menu>div>.proteins-menu>div>.informations>.label {
+.purchase-menu > div > .proteins-menu > div > .informations > .label {
     font-weight: 700;
-    font-size: 1.3em;
+    font-size: 1.05em;
+    color: #ddd8ff;
 }
 
-.purchase-menu>div>.proteins-menu>div>.informations>.description {
+.purchase-menu > div > .proteins-menu > div > .informations > .description {
     font-weight: 300;
-    font-size: 0.9em;
-    opacity: 0.75;
+    font-size: 0.85em;
+    color: rgba(255,255,255,0.5);
 }
 
-.purchase-menu>div>.proteins-menu>div>.purchase-btn {
-    width: 6em;
+.purchase-menu > div > .proteins-menu > div > .purchase-btn {
+    padding: 0.38em 1.05em;
     text-align: center;
-    font-weight: 600;
-    font-size: 1.0em;
-    border-radius: 0.3em;
-    background: var(--main-color);
+    font-weight: 700;
+    font-size: 0.82em;
+    border-radius: 2em;
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.45);
+    border: 1px solid rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.6);
+    color: #e8e4ff;
     cursor: pointer;
-    transition: 0.2s;
-    z-index: 34500;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
-.purchase-menu>div>.proteins-menu>div>.purchase-btn:hover {
-    background: var(--main-color-hover);
-}
-    
-.purchase-menu>div>.proteins-menu>div>.purchase-btn:active {
-    background: var(--main-color-active);
+.purchase-menu > div > .proteins-menu > div > .purchase-btn:hover {
+    background: rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.72);
+    box-shadow: 0 3px 12px rgba(var(--ui-r),var(--ui-g),var(--ui-b),0.38);
 }
 
-
-.purchase-menu>div>.memberships-menu .current-membership {
-    font-weight: 500;
-    font-size: 1.0em;
-}
-
-.purchase-menu>div>.memberships-menu hr {
-    opacity: 0.05;
-    margin-block: 0.7em;
-}
-.purchase-menu>div>.memberships-menu .list {
-    gap: 1em;
-    display: grid;
-}
-
-.purchase-menu>div>.memberships-menu .list > div {
-    display: flex;
-    height: 3em;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5em;
-    background: #c3c3c31f;
-    border-radius: 0.4em;
-    padding: 1em;
-}
-
-.purchase-menu>div>.memberships-menu .list > div .time > p {
-    font-weight: 600;
-}
-
-.purchase-menu>div>.memberships-menu .list > div .purchase-btn {
-    padding-inline: 0.5em;
-    background: var(--main-color);
-    border-radius: 0.3em;
-    padding-block: 0.2em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.purchase-menu>div>.memberships-menu .list > div .purchase-btn:hover {
-    background: var(--main-color-hover);
-}
-
-.purchase-menu>div>.memberships-menu .list > div .purchase-btn:active {
-    background: var(--main-color-active);
+.purchase-menu > div > .proteins-menu > div > .purchase-btn:active {
+    background: rgba(var(--ui-r-dark),var(--ui-g-dark),var(--ui-b-dark),0.8);
 }
 
 /* Receipt */

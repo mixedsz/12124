@@ -69,7 +69,27 @@ window.addEventListener('message', function(event) {
 
             taxBusinessAllowMakeDelayedDeclarations = item.taxBusinessAllowMakeDelayedDeclarations;
             taxBusinessPercentagePerMonthForDelay = item.taxBusinessPercentagePerMonthForDelay;
-			
+
+            if (item.uiColor) {
+                const { r, g, b } = item.uiColor;
+                const mid = (x, d) => Math.max(0, Math.round(x * d));
+                const root = document.documentElement.style;
+                root.setProperty('--ui-r', r);
+                root.setProperty('--ui-g', g);
+                root.setProperty('--ui-b', b);
+                root.setProperty('--ui-r-mid',  mid(r, 0.8));
+                root.setProperty('--ui-g-mid',  mid(g, 0.77));
+                root.setProperty('--ui-b-mid',  mid(b, 0.8));
+                root.setProperty('--ui-r-dark', mid(r, 0.47));
+                root.setProperty('--ui-g-dark', mid(g, 0.35));
+                root.setProperty('--ui-b-dark', mid(b, 0.62));
+                root.setProperty('--main-color',       `rgb(${r},${g},${b})`);
+                root.setProperty('--main-color-hover',  `rgb(${mid(r,0.8)},${mid(g,0.77)},${mid(b,0.8)})`);
+                root.setProperty('--main-color-active', `rgb(${mid(r,0.47)},${mid(g,0.35)},${mid(b,0.62)})`);
+                root.setProperty('--scrollbar-color',       `rgb(${r},${g},${b})`);
+                root.setProperty('--scrollbar-color-hover', `rgb(${mid(r,0.8)},${mid(g,0.77)},${mid(b,0.8)})`);
+            }
+
 			$.post(`https://${GetParentResourceName()}/notifyStatus`, JSON.stringify({status: localStorage.getItem("notify-status")}));
 			$(`.statistics-menu #notification-status div[data-value=${localStorage.getItem("notify-status")}]`).addClass('status-button-active')
 			

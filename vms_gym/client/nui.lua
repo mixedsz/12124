@@ -19,6 +19,8 @@ RegisterNUICallback('loaded', function(data, cb)
         useCityHallTaxes = Config.UseCityHallTaxes,
         useCityHallIncludedTaxes = Config.UseCityHallIncludedTaxes,
 
+        uiColor = Config.UIColor,
+
         taxBusinessAllowMakeDelayedDeclarations = Config.UseVMSCityHall and Config.UseCityHallTaxes and exports[Config.VMSCityHallResource]:TaxBusinessAllowMakeDelayedDeclarations() or nil,
         taxBusinessPercentagePerMonthForDelay = Config.UseVMSCityHall and Config.UseCityHallTaxes and exports[Config.VMSCityHallResource]:TaxBusinessPercentagePerMonthForDelay() or nil,
     })
