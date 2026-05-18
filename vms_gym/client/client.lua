@@ -668,26 +668,32 @@ startAction = function(gymId, pointId, pointTable)
 end
 
 stopAction = function()
-    if Config.Animations[_pointTable.name].exit then
-        TaskPlayAnim(PlayerPedId(), Config.Animations[_pointTable.name].exit[1], Config.Animations[_pointTable.name].exit[2], 8.0, -8.0, Config.Animations[_pointTable.name].exit[3], 0, 0.0, 0, 0, 0)
-        Citizen.Wait(Config.Animations[_pointTable.name].exit[3])
-    else
-        ClearPedTasks(PlayerPedId())
-    end
+    -- Capture exit anim before clearing state so loops stop immediately
+    local exitAnim = Config.Animations[_pointTable.name] and Config.Animations[_pointTable.name].exit
+
+    -- Stop current animation and free the player instantly
+    ClearPedTasks(PlayerPedId())
     FreezeEntityPosition(PlayerPedId(), false)
     SetEntityCollision(PlayerPedId(), true, true)
+
     TriggerServerEvent('vms_gym:sv:setTaken', _gymId, _pointId, false)
     SendNUIMessage({action = 'closeHelpKeys'})
-    if myProp then
-        DeleteObject(myProp)
-    end
-    if myProp2 then
-        DeleteObject(myProp2)
-    end
+
+    if myProp then DeleteObject(myProp) end
+    if myProp2 then DeleteObject(myProp2) end
+
     removeStrength = true
     _gymId, _pointId, _pointTable = nil, nil, nil
     myProp = nil
     myProp2 = nil
+
+    -- Play exit animation as a non-blocking cosmetic after cleanup
+    if exitAnim then
+        TaskPlayAnim(PlayerPedId(), exitAnim[1], exitAnim[2], 8.0, -8.0, exitAnim[3], 0, 0.0, 0, 0, 0)
+        Citizen.SetTimeout(exitAnim[3], function()
+            ClearPedTasks(PlayerPedId())
+        end)
+    end
 end
 
 function addSkill(name, value)
