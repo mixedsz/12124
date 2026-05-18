@@ -156,7 +156,7 @@ function L2_1(A0_2, A1_2)
   L2_2 = A0_2.text
   if L2_2 then
     L2_2 = TriggerServerEvent
-    L3_2 = "vms_gym:sendAnnouncement"
+    L3_2 = "flake_gym:sendAnnouncement"
     L4_2 = currentGymManagement
     L5_2 = A0_2.text
     L2_2(L3_2, L4_2, L5_2)
@@ -213,7 +213,7 @@ function L2_1(A0_2, A1_2)
     return
   end
   L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:hireAnEmployee"
+  L3_2 = "flake_gym:hireAnEmployee"
   L4_2 = currentGymManagement
   L5_2 = A0_2.playerId
   L2_2(L3_2, L4_2, L5_2)
@@ -228,7 +228,7 @@ function L2_1(A0_2, A1_2)
     return
   end
   L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:bonusEmployee"
+  L3_2 = "flake_gym:bonusEmployee"
   L4_2 = currentGymManagement
   L5_2 = A0_2.identifier
   L6_2 = A0_2.bonusMoney
@@ -244,7 +244,7 @@ function L2_1(A0_2, A1_2)
     return
   end
   L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:changeGradeEmployee"
+  L3_2 = "flake_gym:changeGradeEmployee"
   L4_2 = currentGymManagement
   L5_2 = A0_2.identifier
   L6_2 = A0_2.grade
@@ -260,7 +260,7 @@ function L2_1(A0_2, A1_2)
     return
   end
   L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:fireEmployee"
+  L3_2 = "flake_gym:fireEmployee"
   L4_2 = currentGymManagement
   L5_2 = A0_2.identifier
   L2_2(L3_2, L4_2, L5_2)
@@ -300,7 +300,7 @@ function L2_1(A0_2, A1_2)
         L2_2(L3_2, L4_2, L5_2, L6_2)
       else
         L2_2 = TriggerServerEvent
-        L3_2 = "vms_gym:withdraw"
+        L3_2 = "flake_gym:withdraw"
         L4_2 = currentGymManagement
         L5_2 = tonumber
         L6_2 = A0_2.money
@@ -345,7 +345,7 @@ function L2_1(A0_2, A1_2)
         L2_2(L3_2, L4_2, L5_2, L6_2)
       else
         L2_2 = TriggerServerEvent
-        L3_2 = "vms_gym:deposit"
+        L3_2 = "flake_gym:deposit"
         L4_2 = currentGymManagement
         L5_2 = tonumber
         L6_2 = A0_2.money
@@ -422,7 +422,7 @@ function L2_1(A0_2)
     return
   end
   L3_2 = TriggerServerEvent
-  L4_2 = "vms_gym:sv:sellMembership"
+  L4_2 = "flake_gym:sv:sellMembership"
   L5_2 = A0_2.playerId
   L6_2 = currentGymManagement
   L7_2 = L2_2
@@ -456,7 +456,7 @@ function L2_1(A0_2)
     return
   end
   L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:sv:sellProtein"
+  L3_2 = "flake_gym:sv:sellProtein"
   L4_2 = A0_2.playerId
   L5_2 = currentGymManagement
   L6_2 = L1_2.proteins
@@ -473,13 +473,13 @@ function L2_1(A0_2, A1_2)
   L2_2 = A0_2.action
   if "pay" == L2_2 then
     L2_2 = TriggerServerEvent
-    L3_2 = "vms_gym:sv:payBill"
+    L3_2 = "flake_gym:sv:payBill"
     L4_2 = "pay"
     L5_2 = A0_2.type
     L2_2(L3_2, L4_2, L5_2)
   else
     L2_2 = TriggerServerEvent
-    L3_2 = "vms_gym:sv:payBill"
+    L3_2 = "flake_gym:sv:payBill"
     L4_2 = "cancel"
     L2_2(L3_2, L4_2)
     L2_2 = SetNuiFocus

@@ -455,7 +455,7 @@ Citizen.CreateThread(function()
         if myVeh and isDriver then
             if (GetEntitySpeed(myVeh)*speedUnit > Config.SkillDrivingEffectMinimumSpeed) then
                 sleep = false
-                local myDrivingSkill = exports['vms_gym']:getSkill('driving')
+                local myDrivingSkill = exports['flake_gym']:getSkill('driving')
                 if myDrivingSkill < 20.0 then
                     local biasRandom = (math.random(-1, 1) + 0.0)
                     SetVehicleSteerBias(myVeh, biasRandom)

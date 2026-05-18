@@ -45,7 +45,7 @@ Config.ESXMenuDefault_Align = 'right'
 Config.SendNotificationWhenSkillIncrase = true
 Config.SendNotificationWhenSkillDecrease = true
 
-Config.DistanceView = 2.25
+Config.DistanceView = 1.2
 Config.DistanceAccess = 0.7
 Config.UseMarkers = false
 Config.Use3DText = false
@@ -311,7 +311,7 @@ Config.Gyms = {
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-532.8023, -603.4438, 36.2919-0.95, 91.3331),
+                activityCoord = vector4(-532.8023, -603.4438, 36.2919-0.55, 91.3331),
                 position = vec(-532.8023, -603.4438, 36.2919),
                 removeStamina = 8,
                 addSkill = {skill = "strenght", value = {1, 4}}, -- this value is divided by 10 - this means that setting {2, 4} it will be 0.2, 0.4
@@ -319,7 +319,7 @@ Config.Gyms = {
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-532.6644, -605.8417, 36.2920-0.95, 90.3740),
+                activityCoord = vector4(-532.6644, -605.8417, 36.2920-0.55, 90.3740),
                 position = vec(-532.6644, -605.8417, 36.2920),
                 removeStamina = 8,
                 addSkill = {skill = "strenght", value = {1, 4}}, -- this value is divided by 10 - this means that setting {2, 4} it will be 0.2, 0.4
@@ -327,7 +327,7 @@ Config.Gyms = {
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-532.7592, -608.0145, 36.2919-0.95, 90.3740),
+                activityCoord = vector4(-532.7592, -608.0145, 36.2919-0.55, 90.3740),
                 position = vec(-532.7592, -608.0145, 36.2919),
                 removeStamina = 8,
                 addSkill = {skill = "strenght", value = {1, 4}}, -- this value is divided by 10 - this means that setting {2, 4} it will be 0.2, 0.4

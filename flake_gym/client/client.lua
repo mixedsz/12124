@@ -74,7 +74,7 @@ function L10_1(A0_2)
       L2_2 = 2500
       L1_2(L2_2)
       L1_2 = TriggerServerEvent
-      L2_2 = "vms_gym:sv:restartPlayer"
+      L2_2 = "flake_gym:sv:restartPlayer"
       L1_2(L2_2)
     end
   else
@@ -113,7 +113,7 @@ function L10_1(A0_2)
           L2_2 = 2500
           L1_2(L2_2)
           L1_2 = TriggerServerEvent
-          L2_2 = "vms_gym:sv:restartPlayer"
+          L2_2 = "flake_gym:sv:restartPlayer"
           L1_2(L2_2)
         end
       end
@@ -144,7 +144,7 @@ function L10_1(A0_2)
   PlayerData = L1_2
   waitingForLoadAfterRestart = true
   L1_2 = TriggerServerEvent
-  L2_2 = "vms_gym:fetchData"
+  L2_2 = "flake_gym:fetchData"
   L1_2(L2_2)
 end
 L8_1(L9_1, L10_1)
@@ -214,7 +214,7 @@ function L10_1(A0_2, A1_2)
 end
 L8_1(L9_1, L10_1)
 L8_1 = RegisterNetEvent
-L9_1 = "vms_gym:fetchedData"
+L9_1 = "flake_gym:fetchedData"
 function L10_1(A0_2)
   local L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2, L15_2, L16_2
   stores = A0_2
@@ -289,7 +289,7 @@ function L10_1(A0_2)
 end
 L8_1(L9_1, L10_1)
 L8_1 = RegisterNetEvent
-L9_1 = "vms_gym:cl:getBill"
+L9_1 = "flake_gym:cl:getBill"
 function L10_1(A0_2, A1_2, A2_2, A3_2)
   local L4_2, L5_2, L6_2
   L4_2 = SetNuiFocus
@@ -313,7 +313,7 @@ function L10_1(A0_2, A1_2, A2_2, A3_2)
 end
 L8_1(L9_1, L10_1)
 L8_1 = RegisterNetEvent
-L9_1 = "vms_gym:cl:getBillFeedback"
+L9_1 = "flake_gym:cl:getBillFeedback"
 function L10_1()
   local L0_2, L1_2, L2_2
   L0_2 = SetNuiFocus
@@ -327,7 +327,7 @@ function L10_1()
 end
 L8_1(L9_1, L10_1)
 L8_1 = RegisterNetEvent
-L9_1 = "vms_gym:updateBusiness"
+L9_1 = "flake_gym:updateBusiness"
 function L10_1(A0_2, A1_2, A2_2)
   local L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2
   L3_2 = stores
@@ -872,10 +872,10 @@ function L8_1()
 end
 closeManagementMenu = L8_1
 L8_1 = RegisterNetEvent
-L9_1 = "vms_gym:cl:getMemberships"
+L9_1 = "flake_gym:cl:getMemberships"
 L8_1(L9_1)
 L8_1 = AddEventHandler
-L9_1 = "vms_gym:cl:getMemberships"
+L9_1 = "flake_gym:cl:getMemberships"
 function L10_1(A0_2)
   local L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2
   L6_1 = A0_2
@@ -1739,7 +1739,7 @@ function L8_1(A0_2)
     return
   end
   L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:sv:buyProtein"
+  L3_2 = "flake_gym:sv:buyProtein"
   L4_2 = currentShop
   L5_2 = A0_2
   L2_2(L3_2, L4_2, L5_2)
@@ -1784,7 +1784,7 @@ function L8_1(A0_2, A1_2)
     end
   end
   L4_2 = TriggerServerEvent
-  L5_2 = "vms_gym:sv:acceptMembership"
+  L5_2 = "flake_gym:sv:acceptMembership"
   L6_2 = currentShop
   L7_2 = L2_2.requiredMembership
   L8_2 = L3_2
@@ -1919,7 +1919,7 @@ function L8_1(A0_2, A1_2, A2_2)
     L9_2(L10_2)
   end
   L3_2 = TriggerServerEvent
-  L4_2 = "vms_gym:sv:setTaken"
+  L4_2 = "flake_gym:sv:setTaken"
   L5_2 = L0_1
   L6_2 = L1_1
   L7_2 = true
@@ -2506,7 +2506,7 @@ function L8_1()
   L3_2 = true
   L0_2(L1_2, L2_2, L3_2)
   L0_2 = TriggerServerEvent
-  L1_2 = "vms_gym:sv:setTaken"
+  L1_2 = "flake_gym:sv:setTaken"
   L2_2 = L0_1
   L3_2 = L1_1
   L4_2 = false
@@ -2543,7 +2543,7 @@ stopAction = L8_1
 function L8_1(A0_2, A1_2)
   local L2_2, L3_2, L4_2, L5_2
   L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:sv:addValue"
+  L3_2 = "flake_gym:sv:addValue"
   L4_2 = A0_2
   L5_2 = A1_2
   L2_2(L3_2, L4_2, L5_2)
@@ -2567,7 +2567,7 @@ L8_1(L9_1, L10_1)
 function L8_1(A0_2, A1_2)
   local L2_2, L3_2, L4_2, L5_2
   L2_2 = TriggerServerEvent
-  L3_2 = "vms_gym:sv:removeValue"
+  L3_2 = "flake_gym:sv:removeValue"
   L4_2 = A0_2
   L5_2 = A1_2
   L2_2(L3_2, L4_2, L5_2)
@@ -2600,7 +2600,7 @@ L9_1 = "openStatisticsMenu"
 L10_1 = openStatisticsMenu
 L8_1(L9_1, L10_1)
 L8_1 = RegisterNetEvent
-L9_1 = "vms_gym:cl:setTaken"
+L9_1 = "flake_gym:cl:setTaken"
 function L10_1(A0_2, A1_2, A2_2)
   local L3_2
   L3_2 = Config
@@ -2612,7 +2612,7 @@ function L10_1(A0_2, A1_2, A2_2)
 end
 L8_1(L9_1, L10_1)
 L8_1 = RegisterNetEvent
-L9_1 = "vms_gym:cl:updateStatistic"
+L9_1 = "flake_gym:cl:updateStatistic"
 function L10_1(A0_2)
   local L1_2, L2_2, L3_2
   myStatistics = A0_2
@@ -2625,10 +2625,10 @@ function L10_1(A0_2)
 end
 L8_1(L9_1, L10_1)
 L8_1 = RegisterNetEvent
-L9_1 = "vms_gym:runConditionBooster"
+L9_1 = "flake_gym:runConditionBooster"
 L8_1(L9_1)
 L8_1 = AddEventHandler
-L9_1 = "vms_gym:runConditionBooster"
+L9_1 = "flake_gym:runConditionBooster"
 function L10_1(A0_2, A1_2)
   local L2_2, L3_2
   L2_2 = conditionBooster
@@ -2659,10 +2659,10 @@ function L10_1(A0_2, A1_2)
 end
 L8_1(L9_1, L10_1)
 L8_1 = RegisterNetEvent
-L9_1 = "vms_gym:runStrengthBooster"
+L9_1 = "flake_gym:runStrengthBooster"
 L8_1(L9_1)
 L8_1 = AddEventHandler
-L9_1 = "vms_gym:runStrengthBooster"
+L9_1 = "flake_gym:runStrengthBooster"
 function L10_1(A0_2, A1_2)
   local L2_2, L3_2
   L2_2 = strengthBooster
@@ -2693,7 +2693,7 @@ function L10_1(A0_2, A1_2)
 end
 L8_1(L9_1, L10_1)
 L8_1 = RegisterNetEvent
-L9_1 = "vms_gym:notification"
+L9_1 = "flake_gym:notification"
 function L10_1(A0_2, A1_2, A2_2, A3_2, A4_2, A5_2)
   local L6_2, L7_2, L8_2, L9_2, L10_2, L11_2
   if A5_2 then

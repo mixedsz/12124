@@ -382,7 +382,7 @@ window.addEventListener('message', function(event) {
             if (isTaxesAllowed != undefined) {
                 if (item.taxes) {
                     let { LoadTaxesMenu } = window.mySharedFunction();
-                    $('div[data-type="taxes"] .side-boxes > div[data-type="list"] > .taxes-list').html(LoadTaxesMenu(item.taxes, 'vms_gym'));
+                    $('div[data-type="taxes"] .side-boxes > div[data-type="list"] > .taxes-list').html(LoadTaxesMenu(item.taxes, 'flake_gym'));
                 }
             }
 
@@ -454,7 +454,7 @@ window.addEventListener('message', function(event) {
 
             if (item.taxes != undefined) {
                 let { LoadTaxesMenu } = window.mySharedFunction();
-                $('div[data-type="taxes"] .side-boxes > div[data-type="list"] > .taxes-list').html(LoadTaxesMenu(item.taxes, 'vms_gym'));
+                $('div[data-type="taxes"] .side-boxes > div[data-type="list"] > .taxes-list').html(LoadTaxesMenu(item.taxes, 'flake_gym'));
             }
 
             if (item.isResumesAllowed != undefined) {

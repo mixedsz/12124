@@ -1,4 +1,4 @@
--- vms_gym items for ox_inventory
+-- flake_gym items for ox_inventory
 -- Add these entries into your ox_inventory/data/items.lua return table
 
 return {
