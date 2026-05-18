@@ -457,10 +457,12 @@ Citizen.CreateThread(function()
                 if distance < Config.DistanceView then
                     sleep = false
                     if Config.UseMarkers then
-                        DrawMarker(Config.Markers['ShopMenu'].id, v.shopMenu.coords.xyz, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Config.Markers['ShopMenu'].size, Config.Markers['ShopMenu'].color[1], Config.Markers['ShopMenu'].color[2], Config.Markers['ShopMenu'].color[3], Config.Markers['ShopMenu'].color[4], Config.Markers['ShopMenu'].bobUpAndDown, false, false, Config.Markers['ShopMenu'].rotate, false, false, false)
+                        -- Offset z by +0.05 to prevent z-fighting with the floor surface
+                        local mc = v.shopMenu.coords
+                        DrawMarker(Config.Markers['ShopMenu'].id, vec(mc.x, mc.y, mc.z + 0.05), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Config.Markers['ShopMenu'].size, Config.Markers['ShopMenu'].color[1], Config.Markers['ShopMenu'].color[2], Config.Markers['ShopMenu'].color[3], Config.Markers['ShopMenu'].color[4], Config.Markers['ShopMenu'].bobUpAndDown, false, false, Config.Markers['ShopMenu'].rotate, false, false, false)
                     end
                     if Config.Use3DText then
-                        DrawText3D(v.bossMenu.coords.x, v.bossMenu.coords.y, v.bossMenu.coords.z, TRANSLATE("3dtext.shop_menu"))
+                        DrawText3D(v.shopMenu.coords.x, v.shopMenu.coords.y, v.shopMenu.coords.z, TRANSLATE("3dtext.shop_menu"))
                     end
                     if distance < Config.DistanceAccess then
                         inRange = TRANSLATE("textui.shop_menu")
