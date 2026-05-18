@@ -1,0 +1,940 @@
+{
+    "EN": {
+        "currency": "$",
+        "days": "Days",
+        "hours": "Hours",
+        "hour" : "Hour",
+        "day" : "Day",
+
+        "included_tax": "(Incuded tax)",
+
+        "statistics_menu": {
+            "header": "YOUR STATISTICS",
+
+            "strenght": "Strenght",
+            "condition": "Condition",
+            "shooting": "Shooting",
+            "driving": "Driving",
+            "flying": "Flying",
+
+            "notify_status": "Skill Notification Status:",
+            "notify_enabled_status": "ENABLED",
+            "notify_disabled_status": "DISABLED"
+        },
+
+        "help_menu": {
+            "stamina_text": "Stamina:",
+
+            "x": "Stop",
+            "space": "Training"
+        },
+
+        "payments": {
+            "cash": "CASH",
+            "bank": "BANK",
+            "receipt": "RECEIPT"
+        },
+
+        "receipt": {
+            "header": "GYM",
+            "item": "ITEM",
+            "amount": "AMOUNT",
+            "total": "TOTAL",
+            "pay_cash": "CASH",
+            "pay_bank": "BANK",
+            "cancel": "CANCEL"
+        },
+
+        "management_menu": {
+            "menu_title": "Gym Management",
+            
+            "sidebar": {
+                "main_title": "Main",
+                "main_description": "Home page, store information..",
+
+                "employees_title": "Employees",
+                "employees_description": "Manage your employees..",
+
+                "memberships_title": "Memberships",
+                "memberships_description": "Sell memberships to customers..",
+
+                "proteins_title": "Proteins",
+                "proteins_description": "Supplements for sale to facilitate exercise..",
+                
+                "boss_management_title": "Management",
+                "boss_management_description": "Gym management..",
+    
+                "resumes_title": "Resumes",
+                "resumes_description": "Recruit new employees who have submitted resumes..",
+                
+                "taxes_title": "Taxes",
+                "taxes_description": "Pay your taxes, check your business status..."
+            },
+            "select_players": {
+                "citizen": "Citizen {0}",
+                "provide_bill": "Provide a bill"
+            },
+            "main": {
+                "menu_total_earned_header": "Total Earned:",
+                "menu_announcements_header": "News",
+                "menu_announcements_title": "Announcements"
+            },
+            "employees": {
+                "table_employee": "Employee",
+                "table_grade": "Grade",
+                "table_option": "Option",
+                "menu_employees_no_players": "no players around",
+                "menu_employees_header": "Hire employees.",
+                "menu_employees_title": "Employees",
+                "menu_employees_btn": "SEARCH CLOSEST",
+                "citizen": "Citizen {0}",
+                "menu_option_hire_btn": "Hire",
+                "menu_option_bonus_btn": "Bonus",
+                "menu_option_setjob_btn": "Make him a ",
+                "menu_option_fire_btn": "Fire"
+            },
+            "memberships": {
+                "menu_memberships_header": "Sell memberships to customers.",
+                "menu_memberships_title": "Memberships",
+
+                "membership_for": "Membership for",
+                
+                "sell_for": "Sell for"
+            },
+            "proteins": {
+                "menu_proteins_header": "Supplements for sale to facilitate exercise.",
+                "menu_proteins_title": "Proteins",
+
+                "sell": "Sell"
+            },
+            "management": {
+                "menu_balance_header": "Balance:",
+                "menu_balance_btn_withdraw": "WITHDRAW",
+                "menu_balance_btn_deposit": "DEPOSIT",
+                "menu_employees_header": "Employees:",
+                "menu_employees_btn_manage": "MANAGE",
+                "menu_announcement_header": "Write an announcement to your employees.",
+                "menu_announcement_title": "Announcement",
+                "menu_announcement_btn_send": "SEND"
+            },
+            "resumes": {
+                "list_header": "List of resumes received from citizens.",
+                "list_title": "Resumes list",
+
+                "manage_header": "Manage the ability to send resumes.",
+                "manage_title": "Manage applications",
+                "manage_description": "Applications for your company are now:",
+                "manage_description_not_active": "not active",
+                "manage_description_active": "active",
+                "manage_toggle_btn": "Toggle",
+
+                "table_citizen": "Citizen Name",
+                "table_date": "Date",
+                "table_option": "Option"
+                
+                
+            },
+            "taxes": {
+                "taxes_header": "Regulate taxes on your business.",
+                "taxes_title": "Taxes"
+
+            }
+        },
+
+        "purchase_menu": {
+            "memberships_btn": "Memberships",
+            "proteins_btn": "Shop",
+
+            "memberships": {
+                "non_membership": "You do not have a membership to this gym.",
+                "your_membership": "Your membership is valid until {0} {1}",
+
+                "membership_for": "Membership for",
+                "buy_for": "Buy for"
+            },
+            "proteins": {
+                "buy_for": "Buy for",
+                "take": "Take"
+            }
+        }
+    },
+    "CZ": {
+        "currency": "$",
+        "days": "Dny",
+        "hours": "Hodiny",
+        "included_tax": "(Včetně daně)",
+        "statistics_menu": {
+            "header": "VAŠE STATISTIKY",
+            "strenght": "Síla",
+            "condition": "Stav",
+            "shooting": "Střelba",
+            "driving": "Jízda",
+            "flying": "Létání",
+            "notify_status": "Stav upozornění na dovednosti:",
+            "notify_enabled_status": "ZAPNUTO",
+            "notify_disabled_status": "VYPNUTO"
+        },
+        "help_menu": {
+            "stamina_text": "Výdrž:",
+            "x": "Zastavit",
+            "space": "Trénink"
+        },
+        "payments": {
+            "cash": "HOTOVOST",
+            "bank": "BANKA",
+            "receipt": "PŘÍJMKA"
+        },
+        "receipt": {
+            "header": "FITNESS",
+            "item": "POLOŽKA",
+            "amount": "MNOŽSTVÍ",
+            "total": "CELKEM",
+            "pay_cash": "HOTOVOST",
+            "pay_bank": "BANKA",
+            "cancel": "ZRUŠIT"
+        },
+        "management_menu": {
+            "menu_title": "Správa Fitness",
+            "sidebar": {
+                "main_title": "Hlavní",
+                "main_description": "Domovská stránka, informace o obchodě..",
+                "employees_title": "Zaměstnanci",
+                "employees_description": "Spravujte své zaměstnance..",
+                "memberships_title": "Členství",
+                "memberships_description": "Prodávejte členství zákazníkům..",
+                "proteins_title": "Proteiny",
+                "proteins_description": "Doplňky pro prodej, aby cvičení bylo snazší..",
+                "boss_management_title": "Řízení",
+                "boss_management_description": "Řízení fitness..",
+                "resumes_title": "Životopisy",
+                "resumes_description": "Nabírejte nové zaměstnance, kteří odeslali životopisy..",
+                "taxes_title": "Daně",
+                "taxes_description": "Splatné daně, zkontrolujte stav svého podnikání.."
+            },
+            "select_players": {
+                "citizen": "Občan {0}",
+                "provide_bill": "Poskytnout fakturu"
+            },
+            "main": {
+                "menu_total_earned_header": "Celkově vydáno:",
+                "menu_announcements_header": "Zprávy",
+                "menu_announcements_title": "Oznámení"
+            },
+            "employees": {
+                "table_employee": "Zaměstnanec",
+                "table_grade": "Třída",
+                "table_option": "Možnost",
+                "menu_employees_no_players": "žádní hráči kolem",
+                "menu_employees_header": "Najměte zaměstnance.",
+                "menu_employees_title": "Zaměstnanci",
+                "menu_employees_btn": "VYHLEDAT NEJBLIŽŠÍ",
+                "citizen": "Občan {0}",
+                "menu_option_hire_btn": "Najmout",
+                "menu_option_bonus_btn": "Bonus",
+                "menu_option_setjob_btn": "Udělat z něj ",
+                "menu_option_fire_btn": "Vyhořet"
+            },
+            "memberships": {
+                "menu_memberships_header": "Prodávat členství zákazníkům.",
+                "menu_memberships_title": "Členství",
+                "membership_for": "Členství pro",
+                "sell_for": "Prodej za"
+            },
+            "proteins": {
+                "menu_proteins_header": "Doplňky k prodeji usnadňující cvičení.",
+                "menu_proteins_title": "Proteiny",
+                "prodej": "Prodej"
+            },
+            "management": {
+                "menu_balance_header": "Bilance:",
+                "menu_balance_btn_withdraw": "VÝBĚR",
+                "menu_balance_btn_deposit": "VLOŽIT",
+                "menu_employees_header": "Zaměstnanci:",
+                "menu_employees_btn_manage": "SPRÁVA",
+                "menu_announcement_header": "Napište oznámení svým zaměstnancům.",
+                "menu_announcement_title": "Oznámení",
+                "menu_announcement_btn_send": "ODESLAT"
+            },
+            "resumes": {
+                "list_header": "Seznam životopisů obdržených od občanů.",
+                "list_title": "Seznam životopisů",
+                "manage_header": "Spravujte schopnost odesílat životopisy.",
+                "manage_title": "Správa žádostí",
+                "manage_description": "Žádosti o vaši firmu jsou nyní:",
+                "manage_description_not_active": "neaktivní",
+                "manage_toggle_btn": "Přepnout",
+                "table_citizen": "Jméno občana",
+                "table_date": "Datum",
+                "table_option": "Možnost"
+            },
+            "daně": {
+                "daně_header": "Regulujte daně vašeho podnikání.",
+                "daně_title": "Daně"
+            }
+        },
+        "purchase_menu": {
+            "memberships_btn": "Členství",
+            "proteins_btn": "Obchod",
+            "memberships": {
+                "non_membership": "Nemáte členství v této posilovně.",
+                "your_membership": "Vaše členství platí do {0} {1}",
+                "membership_for": "Členství pro",
+                "buy_for": "Koupit za"
+            },
+            "proteins": {
+                "buy_for": "Koupit za",
+                "take": "Vzít"
+            }
+        }
+    },
+    "DE": {
+        "currency": "$",
+        "days": "Tage",
+        "hours": "Stunden",
+        "included_tax": "(Inklusive Steuern)",
+        "statistics_menu": {
+            "header": "DEINE STATISTIKEN",
+            "strenght": "Stärke",
+            "condition": "Zustand",
+            "shooting": "Schießen",
+            "driving": "Fahren",
+            "flying": "Fliegen",
+            "notify_status": "Benachrichtigungsstatus für Fähigkeiten:",
+            "notify_enabled_status": "AKTIVIERT",
+            "notify_disabled_status": "DEAKTIVIERT"
+        },
+        "help_menu": {
+            "stamina_text": "Ausdauer:",
+            "x": "Stop",
+            "space": "Training"
+        },
+        "payments": {
+            "cash": "BARGELD",
+            "bank": "BANK",
+            "receipt": "REZEPT"
+        },
+        "receipt": {
+            "header": "FITNESSSTUDIO",
+            "item": "ELEMENT",
+            "amount": "MENGE",
+            "total": "GESAMT",
+            "pay_cash": "BARGELD",
+            "pay_bank": "BANK",
+            "cancel": "ABBRECHEN"
+        },
+        "management_menu": {
+            "menu_title": "Fitnessstudio-Management",
+            "sidebar": {
+                "main_title": "Hauptmenü",
+                "main_description": "Startseite, Informationen speichern..",
+                "employees_title": "Mitarbeiter",
+                "employees_description": "Verwalten Sie Ihre Mitarbeiter..",
+                "memberships_title": "Mitgliedschaften",
+                "memberships_description": "Verkaufen von Mitgliedschaften an Kunden..",
+                "proteins_title": "Proteine",
+                "proteins_description": "Nahrungsergänzungsmittel zum Verkauf zur Unterstützung des Trainings..",
+                "boss_management_title": "Management",
+                "boss_management_description": "Fitnessstudio-Management..",
+                "resumes_title": "Lebensläufe",
+                "resumes_description": "Neue Mitarbeiter einstellen, die Lebensläufe eingereicht haben..",
+                "taxes_title": "Steuern",
+                "taxes_description": "Zahlen Sie Ihre Steuern, überprüfen Sie den Geschäftsstatus..."
+            },
+            "select_players": {
+                "citizen": "Bürger {0}",
+                "provide_bill": "Eine Rechnung ausstellen"
+            },
+            "main": {
+                "menu_total_earned_header": "Insgesamt verdient:",
+                "menu_announcements_header": "Neuigkeiten",
+                "menu_announcements_title": "Ankündigungen"
+            },
+            "employees": {
+                "table_employee": "Mitarbeiter",
+                "table_grade": "Rang",
+                "table_option": "Option",
+                "menu_employees_no_players": "Keine Spieler in der Nähe",
+                "menu_employees_header": "Mitarbeiter einstellen.",
+                "menu_employees_title": "Mitarbeiter",
+                "menu_employees_btn": "NÄCHSTEN SUCHEN",
+                "citizen": "Bürger {0}",
+                "menu_option_hire_btn": "Einstellen",
+                "menu_option_bonus_btn": "Bonus",
+                "menu_option_setjob_btn": "Mache ihn zu einem ",
+                "menu_option_fire_btn": "Entlassen"
+            },
+            "memberships": {
+                "menu_memberships_header": "Verkaufen von Mitgliedschaften an Kunden.",
+                "menu_memberships_title": "Mitgliedschaften",
+                "membership_for": "Mitgliedschaft für",
+                "sell_for": "Verkaufen für"
+            },
+            "proteins": {
+                "menu_proteins_header": "Nahrungsergänzungsmittel zum Verkauf zur Unterstützung des Trainings.",
+                "menu_proteins_title": "Proteine",
+                "verkaufen": "Verkaufen"
+            },
+            "management": {
+                "menu_balance_header": "Saldo:",
+                "menu_balance_btn_withdraw": "ABHEBEN",
+                "menu_balance_btn_deposit": "EINZAHLEN",
+                "menu_employees_header": "Mitarbeiter:",
+                "menu_employees_btn_manage": "VERWALTEN",
+                "menu_announcement_header": "Schreibe eine Ankündigung an deine Mitarbeiter.",
+                "menu_announcement_title": "Ankündigung",
+                "menu_announcement_btn_send": "SENDEN"
+            },
+            "resumes": {
+                "list_header": "Liste der Lebensläufe von Bürgern erhalten.",
+                "list_title": "Lebenslauf-Liste",
+                "manage_header": "Verwalten Sie die Möglichkeit, Lebensläufe zu senden.",
+                "manage_title": "Anwendungen verwalten",
+                "manage_description": "Bewerbungen für Ihr Unternehmen sind jetzt:",
+                "manage_description_not_active": "nicht aktiv",
+                "manage_description_active": "aktiv",
+                "manage_toggle_btn": "Wechseln",
+                "table_citizen": "Bürgername",
+                "table_date": "Datum",
+                "table_option": "Option"
+            },
+            "taxes": {
+                "taxes_header": "Steuern in Ihrem Unternehmen regulieren.",
+                "taxes_title": "Steuern"
+            }
+        },
+        "purchase_menu": {
+            "memberships_btn": "Mitgliedschaften",
+            "proteins_btn": "Shop",
+            "memberships": {
+                "non_membership": "Sie haben keine Mitgliedschaft in diesem Fitnessstudio.",
+                "your_membership": "Ihre Mitgliedschaft ist gültig bis {0} {1}",
+                "membership_for": "Mitgliedschaft für",
+                "buy_for": "Kaufen für"
+            },
+            "proteins": {
+                "buy_for": "Kaufen für",
+                "nehmen": "Nehmen"
+            }
+        }
+    },
+    "FR": {
+        "currency": "$",
+        "days": "Jours",
+        "hours": "Heures",
+        "included_tax": "(Taxes incluses)",
+        "statistics_menu": {
+            "header": "VOS STATISTIQUES",
+            "strenght": "Force",
+            "condition": "Condition",
+            "shooting": "Tir",
+            "driving": "Conduite",
+            "flying": "Pilotage",
+            "notify_status": "Statut de notification des compétences :",
+            "notify_enabled_status": "ACTIVÉE",
+            "notify_disabled_status": "DÉSACTIVÉE"
+        },
+        "help_menu": {
+            "stamina_text": "Endurance :",
+            "x": "Arrêter",
+            "space": "Entraînement"
+        },
+        "payments": {
+            "cash": "ARGENT",
+            "bank": "BANQUE",
+            "receipt": "REÇU"
+        },
+        "receipt": {
+            "header": "GYM",
+            "item": "ARTICLE",
+            "amount": "MONTANT",
+            "total": "TOTAL",
+            "pay_cash": "ARGENT",
+            "pay_bank": "BANQUE",
+            "cancel": "ANNULER"
+        },
+        "management_menu": {
+            "menu_title": "Gestion de la salle de sport",
+            "sidebar": {
+                "main_title": "Principal",
+                "main_description": "Page d'accueil, informations du magasin..",
+                "employees_title": "Employés",
+                "employees_description": "Gérer vos employés..",
+                "memberships_title": "Adhésions",
+                "memberships_description": "Vendre des adhésions aux clients..",
+                "proteins_title": "Protéines",
+                "proteins_description": "Suppléments en vente pour faciliter l'exercice..",
+                "boss_management_title": "Gestion",
+                "boss_management_description": "Gestion de la salle de sport..",
+                "resumes_title": "CV",
+                "resumes_description": "Recruter de nouveaux employés ayant soumis des CV..",
+                "taxes_title": "Taxes",
+                "taxes_description": "Payer vos taxes, vérifier le statut de votre entreprise..."
+            },
+            "select_players": {
+                "citizen": "Citoyen {0}",
+                "provide_bill": "Fournir une facture"
+            },
+            "main": {
+                "menu_total_earned_header": "Total Gagné :",
+                "menu_announcements_header": "Actualités",
+                "menu_announcements_title": "Annonces"
+            },
+            "employees": {
+                "table_employee": "Employé",
+                "table_grade": "Grade",
+                "table_option": "Option",
+                "menu_employees_no_players": "Aucun joueur à proximité",
+                "menu_employees_header": "Embaucher des employés.",
+                "menu_employees_title": "Employés",
+                "menu_employees_btn": "RECHERCHER LE PLUS PROCHE",
+                "citizen": "Citoyen {0}",
+                "menu_option_hire_btn": "Embaucher",
+                "menu_option_bonus_btn": "Bonus",
+                "menu_option_setjob_btn": "Le nommer ",
+                "menu_option_fire_btn": "Licencier"
+            },
+            "memberships": {
+                "menu_memberships_header": "Vendre des adhésions aux clients.",
+                "menu_memberships_title": "Adhésions",
+                "membership_for": "Adhésion pour",
+                "sell_for": "Vendre pour"
+            },
+            "proteins": {
+                "menu_proteins_header": "Suppléments en vente pour faciliter l'exercice.",
+                "menu_proteins_title": "Protéines",
+                "sell": "Vendre"
+            },
+            "management": {
+                "menu_balance_header": "Solde :",
+                "menu_balance_btn_withdraw": "RETIREE",
+                "menu_balance_btn_deposit": "DÉPOSER",
+                "menu_employees_header": "Employés :",
+                "menu_employees_btn_manage": "GÉRER",
+                "menu_announcement_header": "Écrire une annonce à vos employés.",
+                "menu_announcement_title": "Annonce",
+                "menu_announcement_btn_send": "ENVOYER"
+            },
+            "resumes": {
+                "list_header": "Liste des CV reçus de citoyens.",
+                "list_title": "Liste de CV",
+                "manage_header": "Gérer la possibilité d'envoyer des CV.",
+                "manage_title": "Gérer les candidatures",
+                "manage_description": "Les candidatures pour votre entreprise sont maintenant :",
+                "manage_description_not_active": "inactif",
+                "manage_description_active": "actif",
+                "manage_toggle_btn": "Basculer",
+                "table_citizen": "Nom du Citoyen",
+                "table_date": "Date",
+                "table_option": "Option"
+            },
+            "taxes": {
+                "taxes_header": "Réguler les taxes sur votre entreprise.",
+                "taxes_title": "Taxes"
+            }
+        },
+        "purchase_menu": {
+            "memberships_btn": "Adhésions",
+            "proteins_btn": "Boutique",
+            "memberships": {
+                "non_membership": "Vous n'avez pas d'adhésion à cette salle de sport.",
+                "your_membership": "Votre adhésion est valable jusqu'au {0} {1}",
+                "membership_for": "Adhésion pour",
+                "buy_for": "Acheter pour"
+            },
+            "proteins": {
+                "buy_for": "Acheter pour",
+                "take": "Prendre"
+            }
+        }
+    },
+    "ES": {
+        "currency": "$",
+        "days": "Días",
+        "hours": "Horas",
+        "included_tax": "(Impuesto incluido)",
+        "statistics_menu": {
+            "header": "TUS ESTADÍSTICAS",
+            "strenght": "Fuerza",
+            "condition": "Condición",
+            "shooting": "Disparo",
+            "driving": "Conducción",
+            "flying": "Vuelo",
+            "notify_status": "Estado de Notificación de Habilidad:",
+            "notify_enabled_status": "ACTIVADO",
+            "notify_disabled_status": "DESACTIVADO"
+        },
+        "help_menu": {
+            "stamina_text": "Energía:",
+            "x": "Detener",
+            "space": "Entrenamiento"
+        },
+        "payments": {
+            "cash": "EFECTIVO",
+            "bank": "BANCO",
+            "receipt": "RECIBO"
+        },
+        "receipt": {
+            "header": "GIMNASIO",
+            "item": "ÍTEM",
+            "amount": "CANTIDAD",
+            "total": "TOTAL",
+            "pay_cash": "EFECTIVO",
+            "pay_bank": "BANCO",
+            "cancel": "CANCELAR"
+        },
+        "management_menu": {
+            "menu_title": "Gestión de Gimnasio",
+            "sidebar": {
+                "main_title": "Principal",
+                "main_description": "Página principal, información de la tienda..",
+                "employees_title": "Empleados",
+                "employees_description": "Administra a tus empleados..",
+                "memberships_title": "Membresías",
+                "memberships_description": "Vende membresías a los clientes..",
+                "proteins_title": "Proteínas",
+                "proteins_description": "Suplementos en venta para facilitar el ejercicio..",
+                "boss_management_title": "Gestión",
+                "boss_management_description": "Gestión del gimnasio..",
+                "resumes_title": "Currículums",
+                "resumes_description": "Contrata nuevos empleados que han presentado currículums..",
+                "taxes_title": "Impuestos",
+                "taxes_description": "Paga tus impuestos, verifica el estado de tu negocio.."
+            },
+            "select_players": {
+                "citizen": "Ciudadano {0}",
+                "provide_bill": "Proporcionar factura"
+            },
+            "main": {
+                "menu_total_earned_header": "Total Ganado:",
+                "menu_announcements_header": "Noticias",
+                "menu_announcements_title": "Anuncios"
+            },
+            "employees": {
+                "table_employee": "Empleado",
+                "table_grade": "Rango",
+                "table_option": "Opción",
+                "menu_employees_no_players": "ningún jugador cerca",
+                "menu_employees_header": "Contrata empleados.",
+                "menu_employees_title": "Empleados",
+                "menu_employees_btn": "BUSCAR MÁS CERCANO",
+                "citizen": "Ciudadano {0}",
+                "menu_option_hire_btn": "Contratar",
+                "menu_option_bonus_btn": "Bono",
+                "menu_option_setjob_btn": "Hacerlo ",
+                "menu_option_fire_btn": "Despedir"
+            },
+            "memberships": {
+                "menu_memberships_header": "Vende membresías a los clientes.",
+                "menu_memberships_title": "Membresías",
+                "membership_for": "Membresía para",
+                "sell_for": "Vender por"
+            },
+            "proteins": {
+                "menu_proteins_header": "Suplementos en venta para facilitar el ejercicio.",
+                "menu_proteins_title": "Proteínas",
+                "sell": "Vender"
+            },
+            "management": {
+                "menu_balance_header": "Balanza:",
+                "menu_balance_btn_withdraw": "RETIRO",
+                "menu_balance_btn_deposit": "DEPÓSITO",
+                "menu_employees_header": "Empleados:",
+                "menu_employees_btn_manage": "GESTIONAR",
+                "menu_announcement_header": "Escribe un anuncio para tus empleados.",
+                "menu_announcement_title": "Anuncio",
+                "menu_announcement_btn_send": "ENVIAR"
+            },
+            "resumes": {
+                "list_header": "Lista de currículums recibidos de ciudadanos.",
+                "list_title": "Lista de currículums",
+                "manage_header": "Administra la capacidad de enviar currículums.",
+                "manage_title": "Administrar aplicaciones",
+                "manage_description": "Las aplicaciones para tu empresa están ahora:",
+                "manage_description_not_active": "inactivas",
+                "manage_description_active": "activas",
+                "manage_toggle_btn": "Cambiar",
+                "table_citizen": "Nombre del Ciudadano",
+                "table_date": "Fecha",
+                "table_option": "Opción"
+            },
+            "taxes": {
+                "taxes_header": "Regula los impuestos de tu negocio.",
+                "taxes_title": "Impuestos"
+            }
+        },
+        "purchase_menu": {
+            "memberships_btn": "Membresías",
+            "proteins_btn": "Tienda",
+            "memberships": {
+                "non_membership": "No tienes membresía en este gimnasio.",
+                "your_membership": "Tu membresía es válida hasta el {0} {1}",
+                "membership_for": "Membresía para",
+                "buy_for": "Comprar por"
+            },
+            "proteins": {
+                "buy_for": "Comprar por",
+                "take": "Tomar"
+            }
+        }
+    },
+    "PT": {
+        "currency": "$",
+        "days": "Dias",
+        "hours": "Horas",
+        "included_tax": "(Impostos incluídos)",
+        "statistics_menu": {
+            "header": "SUAS ESTATÍSTICAS",
+            "strenght": "Força",
+            "condition": "Condição",
+            "shooting": "Tiros",
+            "driving": "Dirigir",
+            "flying": "Voar",
+            "notify_status": "Status de Notificação de Habilidade:",
+            "notify_enabled_status": "ATIVADO",
+            "notify_disabled_status": "DESATIVADO"
+        },
+        "help_menu": {
+            "stamina_text": "Energia:",
+            "x": "Parar",
+            "space": "Treinar"
+        },
+        "payments": {
+            "cash": "DINHEIRO",
+            "bank": "BANCO",
+            "receipt": "RECIBO"
+        },
+        "receipt": {
+            "header": "ACADEMIA",
+            "item": "ITEM",
+            "amount": "QUANTIDADE",
+            "total": "TOTAL",
+            "pay_cash": "DINHEIRO",
+            "pay_bank": "BANCO",
+            "cancel": "CANCELAR"
+        },
+        "management_menu": {
+            "menu_title": "Gestão da Academia",
+            "sidebar": {
+                "main_title": "Principal",
+                "main_description": "Página inicial, informações da loja..",
+                "employees_title": "Funcionários",
+                "employees_description": "Gerencie seus funcionários..",
+                "memberships_title": "Membros",
+                "memberships_description": "Venda membros para clientes..",
+                "proteins_title": "Proteínas",
+                "proteins_description": "Suplementos à venda para facilitar o exercício..",
+                "boss_management_title": "Gestão",
+                "boss_management_description": "Gestão da academia..",
+                "resumes_title": "Currículos",
+                "resumes_description": "Recrutar novos funcionários que enviaram currículos..",
+                "taxes_title": "Impostos",
+                "taxes_description": "Pague seus impostos, verifique o status do seu negócio..."
+            },
+            "select_players": {
+                "citizen": "Cidadão {0}",
+                "provide_bill": "Forneça um boleto"
+            },
+            "main": {
+                "menu_total_earned_header": "Total Ganho:",
+                "menu_announcements_header": "Notícias",
+                "menu_announcements_title": "Anúncios"
+            },
+            "employees": {
+                "table_employee": "Funcionário",
+                "table_grade": "Cargo",
+                "table_option": "Opção",
+                "menu_employees_no_players": "nenhum jogador por perto",
+                "menu_employees_header": "Contrate funcionários.",
+                "menu_employees_title": "Funcionários",
+                "menu_employees_btn": "PESQUISAR MAIS PRÓXIMO",
+                "citizen": "Cidadão {0}",
+                "menu_option_hire_btn": "Contratar",
+                "menu_option_bonus_btn": "Bônus",
+                "menu_option_setjob_btn": "Torná-lo um ",
+                "menu_option_fire_btn": "Demissão"
+            },
+            "memberships": {
+                "menu_memberships_header": "Venda membros para clientes.",
+                "menu_memberships_title": "Membros",
+                "membership_for": "Membro para",
+                "sell_for": "Vender por"
+            },
+            "proteins": {
+                "menu_proteins_header": "Suplementos à venda para facilitar o exercício.",
+                "menu_proteins_title": "Proteínas",
+                "sell": "Vender"
+            },
+            "management": {
+                "menu_balance_header": "Balanço:",
+                "menu_balance_btn_withdraw": "SACAR",
+                "menu_balance_btn_deposit": "DEPOSITAR",
+                "menu_employees_header": "Funcionários:",
+                "menu_employees_btn_manage": "GERENCIAR",
+                "menu_announcement_header": "Escreva um anúncio para seus funcionários.",
+                "menu_announcement_title": "Anúncio",
+                "menu_announcement_btn_send": "ENVIAR"
+            },
+            "resumes": {
+                "list_header": "Lista de currículos recebidos de cidadãos.",
+                "list_title": "Lista de Currículos",
+                "manage_header": "Gerenciar a capacidade de enviar currículos.",
+                "manage_title": "Gerenciar aplicações",
+                "manage_description": "As aplicações para sua empresa estão agora:",
+                "manage_description_not_active": "inativo",
+                "manage_description_active": "ativo",
+                "manage_toggle_btn": "Alternar",
+                "table_citizen": "Nome do Cidadão",
+                "table_date": "Data",
+                "table_option": "Opção"
+            },
+            "taxes": {
+                "taxes_header": "Regule os impostos do seu negócio.",
+                "taxes_title": "Impostos"
+            }
+        },
+        "purchase_menu": {
+            "memberships_btn": "Membros",
+            "proteins_btn": "Loja",
+            "memberships": {
+                "non_membership": "Você não tem um membro nesta academia.",
+                "your_membership": "Seu membro é válido até {0} {1}",
+                "membership_for": "Membro para",
+                "buy_for": "Comprar por"
+            },
+            "proteins": {
+                "buy_for": "Comprar por",
+                "take": "Pegar"
+            }
+        }
+    },
+    "PL": {
+        "currency": "$",
+        "days": "Dni",
+        "hours": "Godziny",
+        "included_tax": "(Wliczony podatek)",
+        "statistics_menu": {
+            "header": "Twoje statystyki",
+            "strenght": "Siła",
+            "condition": "Kondycja",
+            "shooting": "Strzelanie",
+            "driving": "Jazda",
+            "flying": "Lotnictwo",
+            "notify_status": "Status powiadomień:",
+            "notify_enabled_status": "WŁĄCZONY",
+            "notify_disabled_status": "WYŁĄCZONY"
+        },
+        "help_menu": {
+            "stamina_text": "Wytrzymałość:",
+            "x": "Zatrzymaj",
+            "space": "Trening"
+        },
+        "payments": {
+            "cash": "Gotówka",
+            "bank": "Bank",
+            "receipt": "Paragon"
+        },
+        "receipt": {
+            "header": "SIŁOWNIA",
+            "item": "PRZEDMIOT",
+            "amount": "ILOŚĆ",
+            "total": "RAZEM",
+            "pay_cash": "GOTÓWKA",
+            "pay_bank": "BANK",
+            "cancel": "ANULUJ"
+        },
+        "management_menu": {
+            "menu_title": "Zarządzanie siłownią",
+            "sidebar": {
+                "main_title": "Główna",
+                "main_description": "Strona główna, informacje o sklepie..",
+                "employees_title": "Pracownicy",
+                "employees_description": "Zarządzaj pracownikami..",
+                "memberships_title": "Członkostwo",
+                "memberships_description": "Sprzedaj członkostwa klientom..",
+                "proteins_title": "Białka",
+                "proteins_description": "Suplementy do sprzedaży ułatwiające ćwiczenia..",
+                "boss_management_title": "Zarządzanie",
+                "boss_management_description": "Zarządzanie siłownią..",
+                "resumes_title": "CV",
+                "resumes_description": "Rekrutuj nowych pracowników, którzy przesłali CV..",
+                "taxes_title": "Podatki",
+                "taxes_description": "Zapłać podatki, sprawdź stan swojej firmy..."
+            },
+            "select_players": {
+                "citizen": "Obywatel {0}",
+                "provide_bill": "Dostarcz fakturę"
+            },
+            "main": {
+                "menu_total_earned_header": "Ogólny dochód:",
+                "menu_announcements_header": "Wiadomości",
+                "menu_announcements_title": "Ogłoszenia"
+            },
+            "employees": {
+                "table_employee": "Pracownik",
+                "table_grade": "Stopień",
+                "table_option": "Opcja",
+                "menu_employees_no_players": "brak graczy w pobliżu",
+                "menu_employees_header": "Zatrudnij pracowników.",
+                "menu_employees_title": "Pracownicy",
+                "menu_employees_btn": "SZUKAJ NAJBLIŻSZYCH",
+                "citizen": "Obywatel {0}",
+                "menu_option_hire_btn": "Zatrudnij",
+                "menu_option_bonus_btn": "Premia",
+                "menu_option_setjob_btn": "Nadaj mu stanowisko ",
+                "menu_option_fire_btn": "Zwolnij"
+            },
+            "memberships": {
+                "menu_memberships_header": "Sprzedaj członkostwa klientom.",
+                "menu_memberships_title": "Członkostwa",
+                "membership_for": "Członkostwo dla",
+                "sell_for": "Sprzedaj za"
+            },
+            "proteins": {
+                "menu_proteins_header": "Suplementy do sprzedaży ułatwiające ćwiczenia.",
+                "menu_proteins_title": "Białka",
+                "sell": "Sprzedaj"
+            },
+            "management": {
+                "menu_balance_header": "Saldo:",
+                "menu_balance_btn_withdraw": "WYPŁAĆ",
+                "menu_balance_btn_deposit": "WPŁAĆ",
+                "menu_employees_header": "Pracownicy:",
+                "menu_employees_btn_manage": "ZARZĄDZAJ",
+                "menu_announcement_header": "Napisz ogłoszenie dla swoich pracowników.",
+                "menu_announcement_title": "Ogłoszenie",
+                "menu_announcement_btn_send": "WYŚLIJ"
+            },
+            "resumes": {
+                "list_header": "Lista cv otrzymanych od obywateli.",
+                "list_title": "Lista CV",
+                "manage_header": "Zarządzaj możliwością przesyłania CV.",
+                "manage_title": "Zarządzaj aplikacjami",
+                "manage_description": "Aplikacje do twojej firmy są teraz:",
+                "manage_description_not_active": "nieaktywne",
+                "manage_description_active": "aktywne",
+                "manage_toggle_btn": "Przełącz",
+                "table_citizen": "Imię i Nazwisko Obywatela",
+                "table_date": "Data",
+                "table_option": "Opcja"
+            },
+            "taxes": {
+                "taxes_header": "Reguluj podatki w swojej firmie.",
+                "taxes_title": "Podatki"
+            }
+        },
+        "purchase_menu": {
+            "memberships_btn": "Członkostwa",
+            "proteins_btn": "Sklep",
+            "memberships": {
+                "non_membership": "Nie masz członkostwa w tej siłowni.",
+                "your_membership": "Twoje członkostwo jest ważne do {0} {1}",
+                "membership_for": "Członkostwo dla",
+                "buy_for": "Kup za"
+            },
+            "proteins": {
+                "buy_for": "Kup za",
+                "take": "Weź"
+            }
+        }
+    }
+}
