@@ -311,7 +311,7 @@ Config.Gyms = {
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-533.3950, -603.2548, 35.2331-1.2, 91.3331),
+                activityCoord = vector4(-533.3950, -603.2548, 35.2331-1.55, 91.3331),
                 position = vec(-533.3950, -603.2548, 35.2331),
                 removeStamina = 8,
                 addSkill = {skill = "strenght", value = {1, 4}},
@@ -319,7 +319,7 @@ Config.Gyms = {
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-533.5690, -605.5276, 35.2331-1.2, 90.3740),
+                activityCoord = vector4(-533.5690, -605.5276, 35.2331-1.55, 90.3740),
                 position = vec(-533.5690, -605.5276, 35.2331),
                 removeStamina = 8,
                 addSkill = {skill = "strenght", value = {1, 4}},
@@ -327,7 +327,7 @@ Config.Gyms = {
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-533.5115, -607.7551, 35.2331-1.2, 90.3740),
+                activityCoord = vector4(-533.5115, -607.7551, 35.2331-1.55, 90.3740),
                 position = vec(-533.5115, -607.7551, 35.2331),
                 removeStamina = 8,
                 addSkill = {skill = "strenght", value = {1, 4}},
