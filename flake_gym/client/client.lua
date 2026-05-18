@@ -1036,10 +1036,18 @@ Citizen.CreateThread(function()
             end
 
             -- Exercise point targets
+            -- Use position (world coords at equipment level) for the target zone,
+            -- not activityCoord (which has an offset z for where the ped is teleported).
             for pointIdx, point in pairs(gymConfig.points) do
+                local heading = point.activityCoord and point.activityCoord.w or 0.0
+                local targetCoords = vector4(
+                    point.position.x,
+                    point.position.y,
+                    point.position.z,
+                    heading)
                 CL.Target({
                     name   = point.name,
-                    coords = point.activityCoord,
+                    coords = targetCoords,
                     size   = point.targetSize,
                     label  = TRANSLATE("target." .. point.name),
                     icon   = "fa-solid fa-dumbbell",
