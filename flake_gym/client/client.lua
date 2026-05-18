@@ -1132,7 +1132,7 @@ function L9_1()
         L13_2 = {}
         L14_2 = L11_2.name
         L13_2.name = L14_2
-        L14_2 = L11_2.activityCoord
+        L14_2 = L11_2.position or L11_2.activityCoord
         L13_2.coords = L14_2
         L14_2 = L11_2.targetSize
         L13_2.size = L14_2

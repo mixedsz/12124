@@ -65,7 +65,7 @@ const PurchaseMenu = {
 
             membershipsData += `<div class="list">`
             for (const [k, v] of Object.entries(membershipsList)) {
-                const hasActiveMembership = !!myMembership;
+                const hasActiveMembership = myMembership && (Number(myMembership) * 1000) > Date.now();
                 membershipsData += `
                     <div>
                         <div class="time">
