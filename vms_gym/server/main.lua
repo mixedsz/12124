@@ -196,11 +196,14 @@ local function setupDatabase()
         CREATE TABLE IF NOT EXISTS `gym_memberships` (
             `id`         INT AUTO_INCREMENT PRIMARY KEY,
             `identifier` VARCHAR(60)  NOT NULL,
-            `membership` VARCHAR(60)  NOT NULL,
+            `membership` VARCHAR(60)  NOT NULL DEFAULT '',
             `time`       BIGINT       NOT NULL,
             UNIQUE KEY `uk_ident_member` (`identifier`,`membership`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ]])
+    -- Guard: if the table pre-existed with different schema (e.g. a `name` column
+    -- instead of `membership`), add the missing column so INSERTs don't fail.
+    MySQL.query("ALTER TABLE `gym_memberships` ADD COLUMN IF NOT EXISTS `membership` VARCHAR(60) NOT NULL DEFAULT ''")
 
     MySQL.query([[
         CREATE TABLE IF NOT EXISTS `gym_stores` (
@@ -351,13 +354,17 @@ AddEventHandler('onResourceStart', function(resourceName)
     loadGymStores()
 end)
 
--- ESX: esx:playerLoaded passes xPlayer object; QB: uses `source`
+-- ESX Legacy: esx:playerLoaded fires with (playerId, xPlayer, isNew, skin)
+-- The first argument is the numeric source ID, not the xPlayer object.
+-- QB-Core: QBCore:Server:OnPlayerLoaded fires with no arguments; use source.
 RegisterNetEvent(Config.PlayerLoadedServer)
 AddEventHandler(Config.PlayerLoadedServer, function(player)
     local source = source
     local identifier
     if Config.Core == "ESX" then
-        identifier = player and player.identifier
+        -- player arg may be numeric source (ESX Legacy) or xPlayer table — handle both
+        local xPlayer = type(player) == 'table' and player or ESX.GetPlayerFromId(source)
+        if xPlayer then identifier = xPlayer.identifier end
     elseif Config.Core == "QB-Core" then
         local P = QBCore.Functions.GetPlayer(source)
         if P then identifier = P.PlayerData.citizenid end
