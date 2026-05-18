@@ -59,13 +59,13 @@ CL.Target = function(data, cb)
     if Config.TargetResource == 'ox_target' then
         exports["ox_target"]:addBoxZone({
             coords = vec(data.coords.x, data.coords.y, data.coords.z),
-            size = data.size,
+            size = data.size or vec(0.45, 0.45, 1.2),
             debug = false,
             useZ = true,
             rotation = data.coords.w or 0.0,
             options = {
                 {
-                    distance = 2.0,
+                    distance = Config.DistanceAccess,
                     name = 'gym-'..data.name,
                     icon = data.icon,
                     label = data.label,

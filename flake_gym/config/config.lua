@@ -45,7 +45,7 @@ Config.ESXMenuDefault_Align = 'right'
 Config.SendNotificationWhenSkillIncrase = true
 Config.SendNotificationWhenSkillDecrease = true
 
-Config.DistanceView = 1.2
+Config.DistanceView = 2.25
 Config.DistanceAccess = 0.7
 Config.UseMarkers = false
 Config.Use3DText = false
@@ -289,21 +289,21 @@ Config.Gyms = {
         points = {
             {
                 name = 'pull-up',
-                activityCoord = vector4(-537.0850, -603.8719, 36.8545-1, 91.2995),
+                activityCoord = vector4(-537.0850, -603.8719, 36.8545-2, 91.2995),
                 position = vec(-537.0850, -603.8719, 36.8545),
                 removeStamina = 6,
                 addSkill = {skill = "strenght", value = {1, 3}}, -- this value is divided by 10 - this means that setting {1, 3} it will be 0.1, 0.3
             },
             {
                 name = 'pull-up',
-                activityCoord = vector4(-537.0741, -605.7084, 36.8802-1, 95.6533),
+                activityCoord = vector4(-537.0741, -605.7084, 36.8802-2, 95.6533),
                 position = vec(-537.0741, -605.7084, 36.8802),
                 removeStamina = 6,
                 addSkill = {skill = "strenght", value = {1, 3}}, -- this value is divided by 10 - this means that setting {1, 3} it will be 0.1, 0.3
             },
             {
                 name = 'pull-up',
-                activityCoord = vector4(-537.0743, -607.5715, 36.8722-1, 92.4739),
+                activityCoord = vector4(-537.0743, -607.5715, 36.8722-2, 92.4739),
                 position = vec(-537.0743, -607.5715, 36.8722),
                 removeStamina = 6,
                 addSkill = {skill = "strenght", value = {1, 3}}, -- this value is divided by 10 - this means that setting {1, 3} it will be 0.1, 0.3
