@@ -102,8 +102,12 @@ end
 -- @UseSkillbar: If you want to use a skill-bar for the exercises you are doing, you can do so below.
 Config.UseSkillbar = true
 Config.Skillbar = function(actionName, cb)
-    local finished = lib.skillCheck({'easy', 'easy', 'medium'})
-    cb(finished)
+    if lib and lib.skillCheck then
+        local finished = lib.skillCheck({'easy', 'easy', 'medium'})
+        cb(finished)
+    else
+        cb(true)
+    end
 end
 
 Config.StatisticCommand = 'mystats'
@@ -311,7 +315,7 @@ Config.Gyms = {
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-533.3950, -603.2548, 35.2331, 91.3331),
+                activityCoord = vector4(-533.3950, -603.2548, 35.2331-0.5, 91.3331),
                 position = vec(-533.3950, -603.2548, 35.2331),
                 removeStamina = 8,
                 addSkill = {skill = "strenght", value = {1, 4}},
@@ -319,7 +323,7 @@ Config.Gyms = {
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-533.5690, -605.5276, 35.2331, 90.3740),
+                activityCoord = vector4(-533.5690, -605.5276, 35.2331-0.5, 90.3740),
                 position = vec(-533.5690, -605.5276, 35.2331),
                 removeStamina = 8,
                 addSkill = {skill = "strenght", value = {1, 4}},
@@ -327,7 +331,7 @@ Config.Gyms = {
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-533.5115, -607.7551, 35.2331, 90.3740),
+                activityCoord = vector4(-533.5115, -607.7551, 35.2331-0.5, 90.3740),
                 position = vec(-533.5115, -607.7551, 35.2331),
                 removeStamina = 8,
                 addSkill = {skill = "strenght", value = {1, 4}},

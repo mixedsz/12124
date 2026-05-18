@@ -2442,104 +2442,40 @@ function L8_1(A0_2, A1_2, A2_2)
   L3_2(L4_2)
 end
 startAction = L8_1
-function L8_1()
-  local L0_2, L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2
-  L0_2 = Config
-  L0_2 = L0_2.Animations
-  L1_2 = L2_1.name
-  L0_2 = L0_2[L1_2]
-  L0_2 = L0_2.exit
-  if L0_2 then
-    L0_2 = TaskPlayAnim
-    L1_2 = PlayerPedId
-    L1_2 = L1_2()
-    L2_2 = Config
-    L2_2 = L2_2.Animations
-    L3_2 = L2_1.name
-    L2_2 = L2_2[L3_2]
-    L2_2 = L2_2.exit
-    L2_2 = L2_2[1]
-    L3_2 = Config
-    L3_2 = L3_2.Animations
-    L4_2 = L2_1.name
-    L3_2 = L3_2[L4_2]
-    L3_2 = L3_2.exit
-    L3_2 = L3_2[2]
-    L4_2 = 8.0
-    L5_2 = -8.0
-    L6_2 = Config
-    L6_2 = L6_2.Animations
-    L7_2 = L2_1.name
-    L6_2 = L6_2[L7_2]
-    L6_2 = L6_2.exit
-    L6_2 = L6_2[3]
-    L7_2 = 0
-    L8_2 = 0.0
-    L9_2 = 0
-    L10_2 = 0
-    L11_2 = 0
-    L0_2(L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2)
-    L0_2 = Citizen
-    L0_2 = L0_2.Wait
-    L1_2 = Config
-    L1_2 = L1_2.Animations
-    L2_2 = L2_1.name
-    L1_2 = L1_2[L2_2]
-    L1_2 = L1_2.exit
-    L1_2 = L1_2[3]
-    L0_2(L1_2)
-  else
-    L0_2 = ClearPedTasks
-    L1_2 = PlayerPedId
-    L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2 = L1_2()
-    L0_2(L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2)
-  end
-  L0_2 = FreezeEntityPosition
-  L1_2 = PlayerPedId
-  L1_2 = L1_2()
-  L2_2 = false
-  L0_2(L1_2, L2_2)
-  L0_2 = SetEntityCollision
-  L1_2 = PlayerPedId
-  L1_2 = L1_2()
-  L2_2 = true
-  L3_2 = true
-  L0_2(L1_2, L2_2, L3_2)
-  L0_2 = TriggerServerEvent
-  L1_2 = "flake_gym:sv:setTaken"
-  L2_2 = L0_1
-  L3_2 = L1_1
-  L4_2 = false
-  L0_2(L1_2, L2_2, L3_2, L4_2)
-  L0_2 = SendNUIMessage
-  L1_2 = {}
-  L1_2.action = "closeHelpKeys"
-  L0_2(L1_2)
-  L0_2 = L3_1
-  if L0_2 then
-    L0_2 = DeleteObject
-    L1_2 = L3_1
-    L0_2(L1_2)
-  end
-  L0_2 = L4_1
-  if L0_2 then
-    L0_2 = DeleteObject
-    L1_2 = L4_1
-    L0_2(L1_2)
-  end
-  removeStrength = true
-  L0_2 = nil
-  L1_2 = nil
-  L2_2 = nil
-  L2_1 = L2_2
-  L1_1 = L1_2
-  L0_1 = L0_2
-  L0_2 = nil
-  L3_1 = L0_2
-  L0_2 = nil
-  L4_1 = L0_2
+function stopAction()
+    local ped = PlayerPedId()
+    local activityName = L2_1 and L2_1.name
+    local exitAnim = activityName and Config.Animations[activityName] and Config.Animations[activityName].exit
+
+    -- play exit animation if defined, then force-clear all tasks
+    if exitAnim then
+        TaskPlayAnim(ped, exitAnim[1], exitAnim[2], 8.0, -8.0, exitAnim[3], 0, 0.0, 0, 0, 0)
+        Citizen.Wait(exitAnim[3])
+    end
+    ClearPedTasksImmediately(ped)
+
+    -- restore ped physics
+    FreezeEntityPosition(ped, false)
+    SetEntityCollision(ped, true, true)
+
+    -- mark spot as free on server
+    TriggerServerEvent("flake_gym:sv:setTaken", L0_1, L1_1, false)
+
+    -- close HUD
+    SendNUIMessage({action = "closeHelpKeys"})
+
+    -- delete attached props
+    if L3_1 then DeleteObject(L3_1) end
+    if L4_1 then DeleteObject(L4_1) end
+
+    -- reset all activity state
+    removeStrength = true
+    L2_1 = nil
+    L1_1 = nil
+    L0_1 = nil
+    L3_1 = nil
+    L4_1 = nil
 end
-stopAction = L8_1
 function L8_1(A0_2, A1_2)
   local L2_2, L3_2, L4_2, L5_2
   L2_2 = TriggerServerEvent
