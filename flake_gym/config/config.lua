@@ -102,7 +102,7 @@ end
 -- @UseSkillbar: If you want to use a skill-bar for the exercises you are doing, you can do so below.
 Config.UseSkillbar = true
 Config.Skillbar = function(actionName, cb)
-    local finished = lib.skillCheck({'easy', 'easy', 'medium'})
+    local finished = exports['ox_lib']:skillCheck({'easy', 'easy', 'medium'})
     cb(finished)
 end
 
@@ -289,48 +289,48 @@ Config.Gyms = {
         points = {
             {
                 name = 'pull-up',
-                activityCoord = vector4(-540.6872, -607.5908, 35.8898-1, 91.2995),
-                position = vec(-540.6872, -607.5908, 35.8898),
+                activityCoord = vector4(-537.0850, -603.8719, 36.8545-2, 91.2995),
+                position = vec(-537.0850, -603.8719, 36.8545),
                 removeStamina = 6,
                 addSkill = {skill = "strenght", value = {1, 3}}, -- this value is divided by 10 - this means that setting {1, 3} it will be 0.1, 0.3
             },
             {
                 name = 'pull-up',
-                activityCoord = vector4(-540.7296, -605.4086, 35.8898-1, 95.6533),
-                position = vec(-540.7296, -605.4086, 35.8898),
+                activityCoord = vector4(-537.0741, -605.7084, 36.8802-2, 95.6533),
+                position = vec(-537.0741, -605.7084, 36.8802),
                 removeStamina = 6,
                 addSkill = {skill = "strenght", value = {1, 3}}, -- this value is divided by 10 - this means that setting {1, 3} it will be 0.1, 0.3
             },
             {
                 name = 'pull-up',
-                activityCoord = vector4(-540.8652, -603.4855, 35.8898-1, 92.4739),
-                position = vec(-540.8652, -603.4855, 35.8898),
+                activityCoord = vector4(-537.0743, -607.5715, 36.8722-2, 92.4739),
+                position = vec(-537.0743, -607.5715, 36.8722),
                 removeStamina = 6,
                 addSkill = {skill = "strenght", value = {1, 3}}, -- this value is divided by 10 - this means that setting {1, 3} it will be 0.1, 0.3
             },
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-532.8023, -603.4438, 36.2919-2, 91.3331),
-                position = vec(-532.8023, -603.4438, 36.2919),
+                activityCoord = vector4(-533.3950, -603.2548, 35.2331, 91.3331),
+                position = vec(-533.3950, -603.2548, 35.2331),
                 removeStamina = 8,
-                addSkill = {skill = "strenght", value = {1, 4}}, -- this value is divided by 10 - this means that setting {2, 4} it will be 0.2, 0.4
+                addSkill = {skill = "strenght", value = {1, 4}},
             },
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-532.6644, -605.8417, 36.2920-2, 90.3740),
-                position = vec(-532.6644, -605.8417, 36.2920),
+                activityCoord = vector4(-533.5690, -605.5276, 35.2331, 90.3740),
+                position = vec(-533.5690, -605.5276, 35.2331),
                 removeStamina = 8,
-                addSkill = {skill = "strenght", value = {1, 4}}, -- this value is divided by 10 - this means that setting {2, 4} it will be 0.2, 0.4
+                addSkill = {skill = "strenght", value = {1, 4}},
             },
             {
                 name = 'bench',
                 prop = {name = 'prop_barbell_60kg', attachBone = 28422, placement = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}},
-                activityCoord = vector4(-532.7592, -608.0145, 36.2919-2, 90.3740),
-                position = vec(-532.7592, -608.0145, 36.2919),
+                activityCoord = vector4(-533.5115, -607.7551, 35.2331, 90.3740),
+                position = vec(-533.5115, -607.7551, 35.2331),
                 removeStamina = 8,
-                addSkill = {skill = "strenght", value = {1, 4}}, -- this value is divided by 10 - this means that setting {2, 4} it will be 0.2, 0.4
+                addSkill = {skill = "strenght", value = {1, 4}},
             },
             {
                 name = 'treadmill',

@@ -11,8 +11,8 @@ shared_script '@WaveShield/resource/waveshield.js'
 fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
-author 'vames™️'
-description 'vms_gym'
+author 'flake'
+description 'flake_gym'
 version '2.0.1'
 shared_scripts {
 	'config/config.lua',

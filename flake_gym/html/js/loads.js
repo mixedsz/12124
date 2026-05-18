@@ -65,6 +65,7 @@ const PurchaseMenu = {
 
             membershipsData += `<div class="list">`
             for (const [k, v] of Object.entries(membershipsList)) {
+                const hasActiveMembership = myMembership && (Number(myMembership) * 1000) > Date.now();
                 membershipsData += `
                     <div>
                         <div class="time">
@@ -74,7 +75,7 @@ const PurchaseMenu = {
                                 ${v.hours ? `${v.hours} ${translation.hours}` : ''}
                             </p>
                         </div>
-                        <div class="purchase-btn" onclick="buyMembership(${v.days}, ${v.hours})">
+                        <div class="purchase-btn${hasActiveMembership ? ' disabled' : ''}" ${!hasActiveMembership ? `onclick="buyMembership(${v.days}, ${v.hours})"` : 'title="You already have an active membership"'}>
                             <p>${translation.purchase_menu.memberships.buy_for} ${translation.currency}${!useCityHallIncludedTaxes && v.totalAmount || v.price}</p>
                         </div>
                     </div>

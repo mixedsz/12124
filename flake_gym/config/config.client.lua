@@ -55,18 +55,20 @@ CL.TextUI = {
     end,
 }
 
+local _targetZoneCount = 0
 CL.Target = function(data, cb)
     if Config.TargetResource == 'ox_target' then
+        _targetZoneCount = _targetZoneCount + 1
         exports["ox_target"]:addBoxZone({
             coords = vec(data.coords.x, data.coords.y, data.coords.z),
-            size = data.size,
+            size = data.size or vec(0.7, 0.7, 1.5),
             debug = false,
             useZ = true,
             rotation = data.coords.w or 0.0,
             options = {
                 {
-                    distance = 2.0,
-                    name = 'gym-'..data.name,
+                    distance = 1.5,
+                    name = 'gym-'..data.name..'-'..tostring(_targetZoneCount),
                     icon = data.icon,
                     label = data.label,
                     groups = data.job or nil,
@@ -436,11 +438,11 @@ end)
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(Config.RefreshTimeRemoveStats)
-        if removeCondition and Config.StatisticsMenu['condition'] then
+        if removeCondition and Config.StatisticsMenu['condition'] and type(removeSkill) == 'function' then
             removeSkill("condition", type(Config.RemoveStatsValues['RemoveCondition']) == "number" and Config.RemoveStatsValues['RemoveCondition']/10.0 or math.random(Config.RemoveStatsValues['RemoveCondition'][1], Config.RemoveStatsValues['RemoveCondition'][2])/10.0)
         end
         Citizen.Wait(3000)
-        if removeStrength and Config.StatisticsMenu['strenght'] then
+        if removeStrength and Config.StatisticsMenu['strenght'] and type(removeSkill) == 'function' then
             removeSkill("strenght", type(Config.RemoveStatsValues['RemoveStrength']) == "number" and Config.RemoveStatsValues['RemoveStrength']/10.0 or math.random(Config.RemoveStatsValues['RemoveStrength'][1], Config.RemoveStatsValues['RemoveStrength'][2])/10.0)
         end
     end
@@ -455,7 +457,7 @@ Citizen.CreateThread(function()
         if myVeh and isDriver then
             if (GetEntitySpeed(myVeh)*speedUnit > Config.SkillDrivingEffectMinimumSpeed) then
                 sleep = false
-                local myDrivingSkill = exports['vms_gym']:getSkill('driving')
+                local myDrivingSkill = exports['flake_gym']:getSkill('driving')
                 if myDrivingSkill < 20.0 then
                     local biasRandom = (math.random(-1, 1) + 0.0)
                     SetVehicleSteerBias(myVeh, biasRandom)
