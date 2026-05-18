@@ -393,6 +393,10 @@ AddEventHandler('vms_gym:sv:restartPlayer', function()
     local identifier = SV.GetIdentifier(source)
     if not identifier then return end
     initPlayer(source, identifier)
+    -- Wait for initPlayer's async DB calls, then clear the client's waitingForLoadAfterRestart flag
+    Citizen.SetTimeout(600, function()
+        TriggerClientEvent('vms_gym:fetchedData', source, gymStores)
+    end)
 end)
 
 -- Send all gym store data to requesting client
