@@ -1,0 +1,45 @@
+-- ╔═╗╔═╗╔╗╔╔═╗╦╔═╗   ╔═╗╔═╗╦═╗╦  ╦╔═╗╦═╗
+-- ║  ║ ║║║║╠╣ ║║ ╦   ╚═╗║╣ ╠╦╝╚╗╔╝║╣ ╠╦╝
+-- ╚═╝╚═╝╝╚╝╚  ╩╚═╝   ╚═╝╚═╝╩╚═ ╚╝ ╚═╝╩╚═
+--
+--  This file is loaded AFTER server/main.lua.
+--  Use it to override SV.* helpers for custom frameworks,
+--  third-party inventories, or alternative payment handlers.
+--
+--  All SV.* functions are defined in server/main.lua with
+--  default ESX / QB-Core implementations.  Override only what
+--  you actually need to change.
+--
+-- ─────────────────────────────────────────────────────────────
+--  EXAMPLE OVERRIDES (uncomment and adjust as needed)
+-- ─────────────────────────────────────────────────────────────
+
+-- ── Custom inventory (e.g. ox_inventory) ─────────────────────
+-- SV.AddItem = function(source, itemName, count)
+--     exports.ox_inventory:AddItem(source, itemName, count)
+--     return true
+-- end
+
+-- ── Custom notification handler ───────────────────────────────
+-- SV.Notification = function(source, title, message, time, icon, notifType, isSkillInfo)
+--     TriggerClientEvent('vms_gym:notification', source, title, message, time, icon, notifType, isSkillInfo)
+-- end
+
+-- ── ESX Legacy – if getAccount is deprecated on your build ───
+-- SV.HasMoney = function(source, moneyType, amount)
+--     local xPlayer = ESX.GetPlayerFromId(source)
+--     if not xPlayer then return false end
+--     if moneyType == 'cash' then
+--         return xPlayer.getMoney() >= amount
+--     else
+--         return xPlayer.getAccount('bank').money >= amount
+--     end
+-- end
+
+-- ── QB-Core – if your build uses different money keys ─────────
+-- SV.HasMoney = function(source, moneyType, amount)
+--     local Player = QBCore.Functions.GetPlayer(source)
+--     if not Player then return false end
+--     local key = moneyType == 'cash' and 'cash' or 'bank'
+--     return (Player.PlayerData.money[key] or 0) >= amount
+-- end
