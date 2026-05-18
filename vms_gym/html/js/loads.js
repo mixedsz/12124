@@ -54,19 +54,29 @@ const PurchaseMenu = {
             if (myMembership) {
                 let {date, time} = formatDate(Number(myMembership))
                 membershipsData += `
-                    <div class="current-membership">${(translation.purchase_menu.memberships.your_membership).format(date, time)}</div>
+                    <div class="current-membership has-membership">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>${(translation.purchase_menu.memberships.your_membership).format(date, time)}</span>
+                    </div>
                 `
             } else {
                 membershipsData += `
-                    <div class="current-membership">${translation.purchase_menu.memberships.non_membership}</div>
+                    <div class="current-membership">
+                        <i class="fa-solid fa-clock"></i>
+                        <span>${translation.purchase_menu.memberships.non_membership}</span>
+                    </div>
                 `
             }
-            membershipsData += `<hr>`
 
             membershipsData += `<div class="list">`
             for (const [k, v] of Object.entries(membershipsList)) {
+                const icon = (v.hours && !v.days) ? 'fa-clock'
+                    : (v.days === 1 && !v.hours) ? 'fa-sun'
+                    : (v.days <= 7) ? 'fa-calendar-week'
+                    : 'fa-calendar-days';
                 membershipsData += `
                     <div>
+                        <div class="tier-icon"><i class="fa-solid ${icon}"></i></div>
                         <div class="time">
                             <p>
                                 ${translation.purchase_menu.memberships.membership_for}
