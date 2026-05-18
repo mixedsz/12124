@@ -1,2686 +1,1203 @@
-local L0_1, L1_1, L2_1, L3_1, L4_1, L5_1, L6_1, L7_1, L8_1, L9_1, L10_1, L11_1, L12_1
+-- ============================================================
+--  flake_gym  –  client.lua  (deobfuscated)
+-- ============================================================
+
 waitingForLoadAfterRestart = false
-currentGymManagement = nil
-L0_1 = {}
-stores = L0_1
-L0_1 = {}
-billCache = L0_1
-L0_1 = {}
-PlayerData = L0_1
-disabledNotifySkillInfo = false
-L0_1 = nil
-L1_1 = nil
-L2_1 = nil
-L3_1 = nil
-L4_1 = nil
-myStatistics = nil
-L5_1 = nil
-L6_1 = {}
-L7_1 = {}
-conditionBooster = 1.0
-strengthBooster = 1.0
-removeStrength = true
-currentShop = nil
-L8_1 = Config
-L8_1 = L8_1.Core
-if "ESX" == L8_1 then
-  L8_1 = Config
-  L8_1 = L8_1.CoreExport
-  L8_1 = L8_1()
-  ESX = L8_1
-else
-  L8_1 = Config
-  L8_1 = L8_1.Core
-  if "QB-Core" == L8_1 then
-    L8_1 = Config
-    L8_1 = L8_1.CoreExport
-    L8_1 = L8_1()
-    QBCore = L8_1
-  end
+currentGymManagement       = nil
+stores                     = {}
+billCache                  = {}
+PlayerData                 = {}
+disabledNotifySkillInfo    = false
+myStatistics               = nil
+conditionBooster           = 1.0
+strengthBooster            = 1.0
+removeStrength             = true
+currentShop                = nil
+
+-- Per-session activity state (module-level locals)
+local currentActivityGymId    = nil   -- gymId of the active exercise
+local currentActivityPointIdx = nil   -- index inside gym.points
+local currentActivityPoint    = nil   -- reference to the config point table
+local propHandle1             = nil   -- barbell / prop attached to ped
+local propHandle2             = nil   -- optional second prop
+local currentStamina          = nil
+local gymMembershipsRaw       = {}    -- array returned by server: {{name, time}, ...}
+local myMemberships           = {}    -- lookup: membershipName -> expireTime
+
+-- ============================================================
+--  Framework initialisation
+-- ============================================================
+if Config.Core == "ESX" then
+    ESX = Config.CoreExport()
+elseif Config.Core == "QB-Core" then
+    QBCore = Config.CoreExport()
 end
-L8_1 = AddEventHandler
-L9_1 = "onResourceStart"
-function L10_1(A0_2)
-  local L1_2, L2_2
-  L1_2 = GetCurrentResourceName
-  L1_2 = L1_2()
-  if A0_2 ~= L1_2 then
-    return
-  end
-  L1_2 = Config
-  L1_2 = L1_2.Core
-  if "ESX" == L1_2 then
-    while true do
-      L1_2 = ESX
-      if L1_2 then
-        break
-      end
-      L1_2 = Citizen
-      L1_2 = L1_2.Wait
-      L2_2 = 200
-      L1_2(L2_2)
-    end
-    L1_2 = ESX
-    L1_2 = L1_2.IsPlayerLoaded
-    L1_2 = L1_2()
-    if L1_2 then
-      L1_2 = ESX
-      L1_2 = L1_2.GetPlayerData
-      L1_2 = L1_2()
-      PlayerData = L1_2
-      waitingForLoadAfterRestart = true
-      L1_2 = Citizen
-      L1_2 = L1_2.Wait
-      L2_2 = 2500
-      L1_2(L2_2)
-      L1_2 = TriggerServerEvent
-      L2_2 = "flake_gym:sv:restartPlayer"
-      L1_2(L2_2)
-    end
-  else
-    L1_2 = Config
-    L1_2 = L1_2.Core
-    if "QB-Core" == L1_2 then
-      while true do
-        L1_2 = QBCore
-        if L1_2 then
-          break
+
+-- ============================================================
+--  Resource restart handler
+-- ============================================================
+AddEventHandler("onResourceStart", function(resourceName)
+    if GetCurrentResourceName() ~= resourceName then return end
+
+    if Config.Core == "ESX" then
+        while not ESX do Citizen.Wait(200) end
+        if ESX.IsPlayerLoaded() then
+            PlayerData = ESX.GetPlayerData()
+            waitingForLoadAfterRestart = true
+            Citizen.Wait(2500)
+            TriggerServerEvent("flake_gym:sv:restartPlayer")
         end
-        L1_2 = Citizen
-        L1_2 = L1_2.Wait
-        L2_2 = 200
-        L1_2(L2_2)
-      end
-      L1_2 = QBCore
-      L1_2 = L1_2.Functions
-      L1_2 = L1_2.GetPlayerData
-      L1_2 = L1_2()
-      if L1_2 then
-        L1_2 = QBCore
-        L1_2 = L1_2.Functions
-        L1_2 = L1_2.GetPlayerData
-        L1_2 = L1_2()
-        L1_2 = L1_2.job
-        if L1_2 then
-          L1_2 = QBCore
-          L1_2 = L1_2.Functions
-          L1_2 = L1_2.GetPlayerData
-          L1_2 = L1_2()
-          PlayerData = L1_2
-          waitingForLoadAfterRestart = true
-          L1_2 = Citizen
-          L1_2 = L1_2.Wait
-          L2_2 = 2500
-          L1_2(L2_2)
-          L1_2 = TriggerServerEvent
-          L2_2 = "flake_gym:sv:restartPlayer"
-          L1_2(L2_2)
+    elseif Config.Core == "QB-Core" then
+        while not QBCore do Citizen.Wait(200) end
+        local pd = QBCore.Functions.GetPlayerData()
+        if pd and pd.job then
+            PlayerData = pd
+            waitingForLoadAfterRestart = true
+            Citizen.Wait(2500)
+            TriggerServerEvent("flake_gym:sv:restartPlayer")
         end
-      end
     end
-  end
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = Config
-L9_1 = L9_1.PlayerLoaded
-L8_1(L9_1)
-L8_1 = AddEventHandler
-L9_1 = Config
-L9_1 = L9_1.PlayerLoaded
-function L10_1(A0_2)
-  local L1_2, L2_2
-  L1_2 = Config
-  L1_2 = L1_2.Core
-  L1_2 = A0_2 or L1_2
-  if "ESX" ~= L1_2 or not A0_2 then
-    L1_2 = Config
-    L1_2 = L1_2.Core
-    L1_2 = QBCore
-    L1_2 = L1_2.Functions
-    L1_2 = L1_2.GetPlayerData
-    L1_2 = "QB-Core" == L1_2 and L1_2
-  end
-  PlayerData = L1_2
-  waitingForLoadAfterRestart = true
-  L1_2 = TriggerServerEvent
-  L2_2 = "flake_gym:fetchData"
-  L1_2(L2_2)
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = Config
-L9_1 = L9_1.JobUpdated
-L8_1(L9_1)
-L8_1 = AddEventHandler
-L9_1 = Config
-L9_1 = L9_1.JobUpdated
-function L10_1(A0_2)
-  local L1_2
-  L1_2 = PlayerData
-  L1_2.job = A0_2
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "vms_cityhall:updatedStatusResume"
-function L10_1(A0_2, A1_2)
-  local L2_2, L3_2
-  L2_2 = Config
-  L2_2 = L2_2.UseCityHallResumes
-  if not L2_2 then
-    return
-  end
-  L2_2 = currentGymManagement
-  if L2_2 then
-    L2_2 = Config
-    L2_2 = L2_2.Gyms
-    L3_2 = currentGymManagement
-    L2_2 = L2_2[L3_2]
-    L2_2 = L2_2.ownerJob
-    if L2_2 == A0_2 then
-      L2_2 = SendNUIMessage
-      L3_2 = {}
-      L3_2.action = "updateManagementMenu"
-      L3_2.isResumesAllowed = A1_2
-      L2_2(L3_2)
+end)
+
+-- ============================================================
+--  Player loaded
+-- ============================================================
+RegisterNetEvent(Config.PlayerLoaded)
+AddEventHandler(Config.PlayerLoaded, function(data)
+    if Config.Core == "ESX" then
+        PlayerData = data or ESX.GetPlayerData()
+    elseif Config.Core == "QB-Core" then
+        PlayerData = QBCore.Functions.GetPlayerData()
     end
-  end
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "vms_cityhall:updatedBusinessTaxes"
-function L10_1(A0_2, A1_2)
-  local L2_2, L3_2
-  L2_2 = Config
-  L2_2 = L2_2.UseCityHallTaxes
-  if not L2_2 then
-    return
-  end
-  L2_2 = currentGymManagement
-  if L2_2 then
-    L2_2 = Config
-    L2_2 = L2_2.Gyms
-    L3_2 = currentGymManagement
-    L2_2 = L2_2[L3_2]
-    L2_2 = L2_2.ownerJob
-    if L2_2 == A0_2 then
-      L2_2 = SendNUIMessage
-      L3_2 = {}
-      L3_2.action = "updateManagementMenu"
-      L3_2.taxes = A1_2
-      L2_2(L3_2)
+    waitingForLoadAfterRestart = true
+    TriggerServerEvent("flake_gym:fetchData")
+end)
+
+-- ============================================================
+--  Job updated
+-- ============================================================
+RegisterNetEvent(Config.JobUpdated)
+AddEventHandler(Config.JobUpdated, function(job)
+    PlayerData.job = job
+end)
+
+-- ============================================================
+--  CityHall integrations
+-- ============================================================
+RegisterNetEvent("vms_cityhall:updatedStatusResume")
+AddEventHandler("vms_cityhall:updatedStatusResume", function(jobName, isAllowed)
+    if not Config.UseCityHallResumes then return end
+    if not currentGymManagement then return end
+    local gymJob = Config.Gyms[currentGymManagement].ownerJob
+    if gymJob == jobName then
+        SendNUIMessage({action = "updateManagementMenu", isResumesAllowed = isAllowed})
     end
-  end
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "flake_gym:fetchedData"
-function L10_1(A0_2)
-  local L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2, L15_2, L16_2
-  stores = A0_2
-  L1_2 = Config
-  L1_2 = L1_2.UseVMSCityHall
-  if L1_2 then
-    L1_2 = Config
-    L1_2 = L1_2.UseCityHallTaxes
-    if L1_2 then
-      L1_2 = pairs
-      L2_2 = Config
-      L2_2 = L2_2.Gyms
-      L1_2, L2_2, L3_2, L4_2 = L1_2(L2_2)
-      for L5_2, L6_2 in L1_2, L2_2, L3_2, L4_2 do
-        L7_2 = L6_2.memberships
-        if L7_2 then
-          L7_2 = next
-          L8_2 = L6_2.memberships
-          L7_2 = L7_2(L8_2)
-          if L7_2 then
-            L7_2 = pairs
-            L8_2 = L6_2.memberships
-            L7_2, L8_2, L9_2, L10_2 = L7_2(L8_2)
-            for L11_2, L12_2 in L7_2, L8_2, L9_2, L10_2 do
-              L13_2 = exports
-              L14_2 = Config
-              L14_2 = L14_2.VMSCityHallResource
-              L13_2 = L13_2[L14_2]
-              L14_2 = L13_2
-              L13_2 = L13_2.getTaxAmount
-              L15_2 = L12_2.price
-              L16_2 = "gym.memberships"
-              L13_2, L14_2, L15_2 = L13_2(L14_2, L15_2, L16_2)
-              L12_2.totalAmount = L13_2
-              L12_2.taxAmount = L14_2
-              L12_2.taxPercentage = L15_2
+end)
+
+RegisterNetEvent("vms_cityhall:updatedBusinessTaxes")
+AddEventHandler("vms_cityhall:updatedBusinessTaxes", function(jobName, taxes)
+    if not Config.UseCityHallTaxes then return end
+    if not currentGymManagement then return end
+    local gymJob = Config.Gyms[currentGymManagement].ownerJob
+    if gymJob == jobName then
+        SendNUIMessage({action = "updateManagementMenu", taxes = taxes})
+    end
+end)
+
+-- ============================================================
+--  Server sends gym store data after player loads
+-- ============================================================
+RegisterNetEvent("flake_gym:fetchedData")
+AddEventHandler("flake_gym:fetchedData", function(serverStores)
+    stores = serverStores
+
+    -- Enrich membership/protein prices with city-hall tax data if needed
+    if Config.UseVMSCityHall and Config.UseCityHallTaxes then
+        for _, gymConfig in pairs(Config.Gyms) do
+            if gymConfig.memberships then
+                for _, mem in pairs(gymConfig.memberships) do
+                    local total, tax, pct = exports[Config.VMSCityHallResource]:getTaxAmount(mem.price, "gym.memberships")
+                    mem.totalAmount   = total
+                    mem.taxAmount     = tax
+                    mem.taxPercentage = pct
+                end
             end
-          end
-        end
-        L7_2 = L6_2.proteins
-        if L7_2 then
-          L7_2 = next
-          L8_2 = L6_2.proteins
-          L7_2 = L7_2(L8_2)
-          if L7_2 then
-            L7_2 = pairs
-            L8_2 = L6_2.proteins
-            L7_2, L8_2, L9_2, L10_2 = L7_2(L8_2)
-            for L11_2, L12_2 in L7_2, L8_2, L9_2, L10_2 do
-              L13_2 = exports
-              L14_2 = Config
-              L14_2 = L14_2.VMSCityHallResource
-              L13_2 = L13_2[L14_2]
-              L14_2 = L13_2
-              L13_2 = L13_2.getTaxAmount
-              L15_2 = L12_2.price
-              L16_2 = L6_2.tax
-              if not L16_2 then
-                L16_2 = "gym.proteins"
-              end
-              L13_2, L14_2, L15_2 = L13_2(L14_2, L15_2, L16_2)
-              L12_2.totalAmount = L13_2
-              L12_2.taxAmount = L14_2
-              L12_2.taxPercentage = L15_2
+            if gymConfig.proteins then
+                for _, prot in pairs(gymConfig.proteins) do
+                    local taxCategory = prot.tax or "gym.proteins"
+                    local total, tax, pct = exports[Config.VMSCityHallResource]:getTaxAmount(prot.price, taxCategory)
+                    prot.totalAmount   = total
+                    prot.taxAmount     = tax
+                    prot.taxPercentage = pct
+                end
             end
-          end
         end
-      end
     end
-  end
-  waitingForLoadAfterRestart = false
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "flake_gym:cl:getBill"
-function L10_1(A0_2, A1_2, A2_2, A3_2)
-  local L4_2, L5_2, L6_2
-  L4_2 = SetNuiFocus
-  L5_2 = true
-  L6_2 = true
-  L4_2(L5_2, L6_2)
-  if A1_2 then
-    L4_2 = SendNUIMessage
-    L5_2 = {}
-    L5_2.action = "openReceipt"
-    L5_2.membershipData = A1_2
-    L4_2(L5_2)
-  elseif A2_2 and A3_2 then
-    L4_2 = SendNUIMessage
-    L5_2 = {}
-    L5_2.action = "openReceipt"
-    L5_2.proteinsData = A2_2
-    L5_2.count = A3_2
-    L4_2(L5_2)
-  end
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "flake_gym:cl:getBillFeedback"
-function L10_1()
-  local L0_2, L1_2, L2_2
-  L0_2 = SetNuiFocus
-  L1_2 = false
-  L2_2 = false
-  L0_2(L1_2, L2_2)
-  L0_2 = SendNUIMessage
-  L1_2 = {}
-  L1_2.action = "closeReceipt"
-  L0_2(L1_2)
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "flake_gym:updateBusiness"
-function L10_1(A0_2, A1_2, A2_2)
-  local L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2
-  L3_2 = stores
-  L3_2 = L3_2[A0_2]
-  if not L3_2 then
-    return
-  end
-  L3_2 = 0
-  if A2_2 then
-    L4_2 = A2_2.sub
-    if L4_2 then
-      L4_2 = A2_2.sub
-      if "balance" ~= L4_2 then
-        L4_2 = A2_2.sub
-        if "totalEarned" ~= L4_2 then
-          goto lbl_34
+
+    waitingForLoadAfterRestart = false
+end)
+
+-- ============================================================
+--  Receipt / bill events from server
+-- ============================================================
+RegisterNetEvent("flake_gym:cl:getBill")
+AddEventHandler("flake_gym:cl:getBill", function(_, membershipData, proteinsData, count)
+    SetNuiFocus(true, true)
+    if membershipData then
+        SendNUIMessage({action = "openReceipt", membershipData = membershipData})
+    elseif proteinsData and count then
+        SendNUIMessage({action = "openReceipt", proteinsData = proteinsData, count = count})
+    end
+end)
+
+RegisterNetEvent("flake_gym:cl:getBillFeedback")
+AddEventHandler("flake_gym:cl:getBillFeedback", function()
+    SetNuiFocus(false, false)
+    SendNUIMessage({action = "closeReceipt"})
+end)
+
+-- ============================================================
+--  Business data update (balance / employees / announcements)
+-- ============================================================
+RegisterNetEvent("flake_gym:updateBusiness")
+AddEventHandler("flake_gym:updateBusiness", function(gymId, newData, changeInfo)
+    if not stores[gymId] then return end
+
+    local societyBalance = nil
+
+    if changeInfo then
+        if changeInfo.sub then
+            -- single-field update
+            local sub = changeInfo.sub
+            if sub == "balance" then
+                if not Config.UseBuildInCompanyBalance then
+                    societyBalance = changeInfo.value
+                end
+            elseif sub == "totalEarned" then
+                stores[gymId].data[sub] = changeInfo.value
+            else
+                stores[gymId][sub] = changeInfo.value
+            end
+        else
+            -- batch update (array of {sub, value})
+            for _, item in pairs(changeInfo) do
+                if item.sub == "balance" then
+                    if not Config.UseBuildInCompanyBalance then
+                        societyBalance = item.value
+                    end
+                elseif item.sub == "data" then
+                    stores[gymId].data = item.value
+                else
+                    stores[gymId].data[item.sub] = item.value
+                end
+            end
         end
-      end
-      L4_2 = A2_2.sub
-      if "balance" == L4_2 then
-        L4_2 = Config
-        L4_2 = L4_2.UseBuildInCompanyBalance
-        if not L4_2 then
-          L3_2 = A2_2.value
-      end
-      else
-        L4_2 = stores
-        L4_2 = L4_2[A0_2]
-        L4_2 = L4_2.data
-        L5_2 = A2_2.sub
-        L6_2 = A2_2.value
-        L4_2[L5_2] = L6_2
-        goto lbl_74
-      end
-      ::lbl_34::
-      L4_2 = stores
-      L4_2 = L4_2[A0_2]
-      L5_2 = A2_2.sub
-      L6_2 = A2_2.value
-      L4_2[L5_2] = L6_2
     else
-      L4_2 = pairs
-      L5_2 = A2_2
-      L4_2, L5_2, L6_2, L7_2 = L4_2(L5_2)
-      for L8_2, L9_2 in L4_2, L5_2, L6_2, L7_2 do
-        L10_2 = L9_2.sub
-        if "data" == L10_2 then
-          L10_2 = stores
-          L10_2 = L10_2[A0_2]
-          L11_2 = L9_2.sub
-          L12_2 = L9_2.value
-          L10_2[L11_2] = L12_2
+        stores[gymId] = newData
+    end
+
+    if currentGymManagement and currentGymManagement == gymId then
+        if changeInfo and changeInfo.sub == "employees" then
+            CL.GetEmployees(function(employees)
+                SendNUIMessage({
+                    action        = "updateManagementMenu",
+                    storeData     = stores[gymId],
+                    employees     = employees,
+                    employeesCount = #employees,
+                })
+            end, Config.Gyms[gymId].ownerJob)
         else
-          L10_2 = L9_2.sub
-          if "balance" == L10_2 then
-            L10_2 = Config
-            L10_2 = L10_2.UseBuildInCompanyBalance
-            if not L10_2 then
-              L3_2 = L9_2.value
-          end
-          else
-            L10_2 = stores
-            L10_2 = L10_2[A0_2]
-            L10_2 = L10_2.data
-            L11_2 = L9_2.sub
-            L12_2 = L9_2.value
-            L10_2[L11_2] = L12_2
-          end
-        end
-      end
-    end
-  else
-    L4_2 = stores
-    L4_2[A0_2] = A1_2
-  end
-  ::lbl_74::
-  L4_2 = currentGymManagement
-  if L4_2 then
-    L4_2 = currentGymManagement
-    if L4_2 == A0_2 then
-      if A2_2 then
-        L4_2 = A2_2.sub
-        if L4_2 then
-          L4_2 = A2_2.sub
-          if "employees" == L4_2 then
-            L4_2 = CL
-            L4_2 = L4_2.GetEmployees
-            function L5_2(A0_3)
-              local L1_3, L2_3, L3_3, L4_3
-              L1_3 = SendNUIMessage
-              L2_3 = {}
-              L2_3.action = "updateManagementMenu"
-              L3_3 = stores
-              L4_3 = currentGymManagement
-              L3_3 = L3_3[L4_3]
-              L2_3.storeData = L3_3
-              L2_3.employees = A0_3
-              L3_3 = #A0_3
-              L2_3.employeesCount = L3_3
-              L1_3(L2_3)
+            local msg = {
+                action    = "updateManagementMenu",
+                storeData = stores[gymId],
+            }
+            if societyBalance and tonumber(societyBalance) then
+                msg.societyBalance = tostring(societyBalance)
             end
-            L6_2 = Config
-            L6_2 = L6_2.Gyms
-            L7_2 = currentGymManagement
-            L6_2 = L6_2[L7_2]
-            L6_2 = L6_2.ownerJob
-            L4_2(L5_2, L6_2)
+            SendNUIMessage(msg)
         end
-      end
-      else
-        L4_2 = SendNUIMessage
-        L5_2 = {}
-        L5_2.action = "updateManagementMenu"
-        L6_2 = stores
-        L7_2 = currentGymManagement
-        L6_2 = L6_2[L7_2]
-        L5_2.storeData = L6_2
-        L6_2 = Config
-        L6_2 = L6_2.UseBuildInCompanyBalance
-        if not L6_2 then
-          L6_2 = tonumber
-          L7_2 = L3_2
-          L6_2 = L6_2(L7_2)
-          if L6_2 then
-            L6_2 = tostring
-            L7_2 = L3_2
-            L6_2 = L6_2(L7_2)
-            if L6_2 then
-              goto lbl_121
-            end
-          end
-        end
-        L6_2 = nil
-        ::lbl_121::
-        L5_2.societyBalance = L6_2
-        L4_2(L5_2)
-      end
     end
-  end
+end)
+
+-- ============================================================
+--  Memberships received from server
+-- ============================================================
+RegisterNetEvent("flake_gym:cl:getMemberships")
+AddEventHandler("flake_gym:cl:getMemberships", function(membershipsArray)
+    gymMembershipsRaw = membershipsArray
+    myMemberships     = {}
+    for _, entry in pairs(gymMembershipsRaw) do
+        myMemberships[entry.name] = entry.time
+    end
+
+    -- If a shop is currently open, refresh the membership display
+    if currentShop then
+        local shopCfg = Config.Gyms[currentShop]
+        if shopCfg and shopCfg.requiredMembership then
+            SendNUIMessage({
+                action      = "updatePurchaseMenu",
+                type        = "membership",
+                myMembership = myMemberships[shopCfg.requiredMembership],
+            })
+        end
+    end
+end)
+
+-- ============================================================
+--  Statistic update from server
+-- ============================================================
+RegisterNetEvent("flake_gym:cl:updateStatistic")
+AddEventHandler("flake_gym:cl:updateStatistic", function(stats)
+    myStatistics = stats
+    SendNUIMessage({action = "updateStatisticsMenu", stats = myStatistics})
+end)
+
+-- ============================================================
+--  Mark exercise spot as taken / free  (broadcast from server)
+-- ============================================================
+RegisterNetEvent("flake_gym:cl:setTaken")
+AddEventHandler("flake_gym:cl:setTaken", function(gymId, pointIdx, taken)
+    Config.Gyms[gymId].points[pointIdx].taken = taken
+end)
+
+-- ============================================================
+--  Booster items (protein / run-booster effects)
+-- ============================================================
+RegisterNetEvent("flake_gym:runConditionBooster")
+AddEventHandler("flake_gym:runConditionBooster", function(multiplier, duration)
+    if conditionBooster ~= 1.0 then return end
+    if not tonumber(multiplier) or not tonumber(duration) then return end
+    conditionBooster = multiplier
+    Citizen.CreateThread(function()
+        Citizen.Wait(duration)
+        conditionBooster = 1.0
+    end)
+end)
+
+RegisterNetEvent("flake_gym:runStrengthBooster")
+AddEventHandler("flake_gym:runStrengthBooster", function(multiplier, duration)
+    if strengthBooster ~= 1.0 then return end
+    if not tonumber(multiplier) or not tonumber(duration) then return end
+    strengthBooster = multiplier
+    Citizen.CreateThread(function()
+        Citizen.Wait(duration)
+        strengthBooster = 1.0
+    end)
+end)
+
+-- ============================================================
+--  Generic notification event (from server)
+-- ============================================================
+RegisterNetEvent("flake_gym:notification")
+AddEventHandler("flake_gym:notification", function(title, message, duration, icon, ntype, isSkillNotif)
+    if isSkillNotif and disabledNotifySkillInfo == 1 then return end
+    CL.Notification(title, message, duration, icon, ntype)
+end)
+
+-- ============================================================
+--  Helper: load animation dictionary
+-- ============================================================
+function loadAnimDict(dict)
+    while not HasAnimDictLoaded(dict) do
+        RequestAnimDict(dict)
+        Wait(5)
+    end
 end
-L8_1(L9_1, L10_1)
-function L8_1(A0_2)
-  local L1_2, L2_2, L3_2, L4_2, L5_2, L6_2
-  L1_2 = waitingForLoadAfterRestart
-  if L1_2 then
-    return
-  end
-  L1_2 = Config
-  L1_2 = L1_2.Gyms
-  L1_2 = L1_2[A0_2]
-  L2_2 = Config
-  L2_2 = L2_2.UseVMSCityHall
-  if L2_2 then
-    L2_2 = Config
-    L2_2 = L2_2.Core
-    if "ESX" == L2_2 then
-      L2_2 = ESX
-      L2_2 = L2_2.TriggerServerCallback
-      L3_2 = "vms_cityhall:getBusinessData"
-      function L4_2(A0_3, A1_3)
-        local L2_3, L3_3, L4_3, L5_3, L6_3, L7_3
-        L2_3 = A0_3
-        L3_3 = A1_3
-        L4_3 = CL
-        L4_3 = L4_3.GetEmployees
-        function L5_3(A0_4)
-          local L1_4, L2_4, L3_4, L4_4, L5_4, L6_4
-          L1_4 = A0_2
-          currentGymManagement = L1_4
-          L1_4 = SendNUIMessage
-          L2_4 = {}
-          L2_4.action = "openManagementMenu"
-          L3_4 = stores
-          L4_4 = A0_2
-          L3_4 = L3_4[L4_4]
-          L2_4.storeData = L3_4
-          L3_4 = Config
-          L3_4 = L3_4.Gyms
-          L4_4 = A0_2
-          L3_4 = L3_4[L4_4]
-          L2_4.storeCfg = L3_4
-          L2_4.employees = A0_4
-          L3_4 = #A0_4
-          L2_4.employeesCount = L3_4
-          L3_4 = CL
-          L3_4 = L3_4.IsEmployee
-          L4_4 = Config
-          L4_4 = L4_4.Gyms
-          L5_4 = A0_2
-          L4_4 = L4_4[L5_4]
-          L4_4 = L4_4.ownerJob
-          L3_4 = L3_4(L4_4)
-          L2_4.isEmployee = L3_4
-          L3_4 = CL
-          L3_4 = L3_4.IsManager
-          L4_4 = Config
-          L4_4 = L4_4.Gyms
-          L5_4 = A0_2
-          L4_4 = L4_4[L5_4]
-          L4_4 = L4_4.ownerJob
-          L5_4 = A0_2
-          L3_4 = L3_4(L4_4, L5_4)
-          L2_4.isManager = L3_4
-          L3_4 = CL
-          L3_4 = L3_4.IsBoss
-          L4_4 = Config
-          L4_4 = L4_4.Gyms
-          L5_4 = A0_2
-          L4_4 = L4_4[L5_4]
-          L4_4 = L4_4.ownerJob
-          L5_4 = A0_2
-          L3_4 = L3_4(L4_4, L5_4)
-          L2_4.isBoss = L3_4
-          L3_4 = CL
-          L3_4 = L3_4.IsAllowedCityhall
-          L4_4 = Config
-          L4_4 = L4_4.Gyms
-          L5_4 = A0_2
-          L4_4 = L4_4[L5_4]
-          L4_4 = L4_4.ownerJob
-          L5_4 = A0_2
-          L3_4 = L3_4(L4_4, L5_4)
-          L2_4.cityhallGrades = L3_4
-          L3_4 = L1_2.requiredMembership
-          if L3_4 then
-            L3_4 = L1_2.allowSellMembership
-            if L3_4 then
-              L3_4 = L1_2.memberships
-              if L3_4 then
-                goto lbl_68
-              end
-            end
-          end
-          L3_4 = nil
-          ::lbl_68::
-          L2_4.membershipsList = L3_4
-          L3_4 = L1_2.allowSellProteins
-          if L3_4 then
-            L3_4 = L1_2.proteins
-            if L3_4 then
-              goto lbl_76
-            end
-          end
-          L3_4 = nil
-          ::lbl_76::
-          L2_4.proteinsList = L3_4
-          L3_4 = Config
-          L3_4 = L3_4.UseCityHallResumes
-          if L3_4 then
-            L3_4 = exports
-            L4_4 = Config
-            L4_4 = L4_4.VMSCityHallResource
-            L3_4 = L3_4[L4_4]
-            L4_4 = L3_4
-            L3_4 = L3_4.isResumesAllowed
-            L5_4 = Config
-            L5_4 = L5_4.Gyms
-            L6_4 = A0_2
-            L5_4 = L5_4[L6_4]
-            L5_4 = L5_4.ownerJob
-            L3_4 = L3_4(L4_4, L5_4)
-            if L3_4 then
-              goto lbl_95
-            end
-          end
-          L3_4 = false
-          ::lbl_95::
-          L2_4.isResumesAllowed = L3_4
-          L3_4 = L2_3
-          L2_4.resumes = L3_4
-          L3_4 = Config
-          L3_4 = L3_4.UseCityHallTaxes
-          L2_4.isTaxesAllowed = L3_4
-          L3_4 = L3_3
-          L2_4.taxes = L3_4
-          L1_4(L2_4)
+
+-- ============================================================
+--  Helper: request / load prop model
+-- ============================================================
+function requestProp(modelHash)
+    RequestModel(modelHash)
+    while not HasModelLoaded(modelHash) do
+        Citizen.Wait(100)
+        RequestModel(modelHash)
+    end
+end
+
+-- ============================================================
+--  Open / close boss management menu
+-- ============================================================
+function openBossMenu(gymId)
+    if waitingForLoadAfterRestart then return end
+
+    local gymConfig = Config.Gyms[gymId]
+    if not gymConfig then return end
+
+    local function launchMenu(employees)
+        currentGymManagement = gymId
+
+        local membershipsList = nil
+        if gymConfig.requiredMembership and gymConfig.allowSellMembership and gymConfig.memberships then
+            membershipsList = gymConfig.memberships
         end
-        L6_3 = Config
-        L6_3 = L6_3.Gyms
-        L7_3 = A0_2
-        L6_3 = L6_3[L7_3]
-        L6_3 = L6_3.ownerJob
-        L4_3(L5_3, L6_3)
-      end
-      L5_2 = Config
-      L5_2 = L5_2.UseCityHallResumes
-      L6_2 = Config
-      L6_2 = L6_2.UseCityHallTaxes
-      L2_2(L3_2, L4_2, L5_2, L6_2)
+
+        local proteinsList = nil
+        if gymConfig.allowSellProteins and gymConfig.proteins then
+            proteinsList = gymConfig.proteins
+        end
+
+        local isResumesAllowed = false
+        if Config.UseCityHallResumes then
+            isResumesAllowed = exports[Config.VMSCityHallResource]:isResumesAllowed(gymConfig.ownerJob) or false
+        end
+
+        local resumes, taxes = nil, nil
+        local isTaxesAllowed = Config.UseCityHallTaxes
+
+        local msg = {
+            action          = "openManagementMenu",
+            storeData       = stores[gymId],
+            storeCfg        = gymConfig,
+            employees       = employees,
+            employeesCount  = #employees,
+            isEmployee      = CL.IsEmployee(gymConfig.ownerJob),
+            isManager       = CL.IsManager(gymConfig.ownerJob, gymId),
+            isBoss          = CL.IsBoss(gymConfig.ownerJob, gymId),
+            cityhallGrades  = CL.IsAllowedCityhall(gymConfig.ownerJob, gymId),
+            membershipsList = membershipsList,
+            proteinsList    = proteinsList,
+            isResumesAllowed = isResumesAllowed,
+            resumes         = resumes,
+            isTaxesAllowed  = isTaxesAllowed,
+            taxes           = taxes,
+        }
+        SendNUIMessage(msg)
+    end
+
+    if Config.UseVMSCityHall then
+        local fetchCallback = function(resumesData, taxesData)
+            CL.GetEmployees(function(employees)
+                -- patch resumes / taxes into the message after employees arrive
+                currentGymManagement = gymId
+
+                local membershipsList = nil
+                if gymConfig.requiredMembership and gymConfig.allowSellMembership and gymConfig.memberships then
+                    membershipsList = gymConfig.memberships
+                end
+                local proteinsList = nil
+                if gymConfig.allowSellProteins and gymConfig.proteins then
+                    proteinsList = gymConfig.proteins
+                end
+                local isResumesAllowed = false
+                if Config.UseCityHallResumes then
+                    isResumesAllowed = exports[Config.VMSCityHallResource]:isResumesAllowed(gymConfig.ownerJob) or false
+                end
+
+                SendNUIMessage({
+                    action          = "openManagementMenu",
+                    storeData       = stores[gymId],
+                    storeCfg        = gymConfig,
+                    employees       = employees,
+                    employeesCount  = #employees,
+                    isEmployee      = CL.IsEmployee(gymConfig.ownerJob),
+                    isManager       = CL.IsManager(gymConfig.ownerJob, gymId),
+                    isBoss          = CL.IsBoss(gymConfig.ownerJob, gymId),
+                    cityhallGrades  = CL.IsAllowedCityhall(gymConfig.ownerJob, gymId),
+                    membershipsList = membershipsList,
+                    proteinsList    = proteinsList,
+                    isResumesAllowed = isResumesAllowed,
+                    resumes         = resumesData,
+                    isTaxesAllowed  = Config.UseCityHallTaxes,
+                    taxes           = taxesData,
+                })
+            end, gymConfig.ownerJob)
+        end
+
+        if Config.Core == "ESX" then
+            ESX.TriggerServerCallback("vms_cityhall:getBusinessData",
+                fetchCallback,
+                Config.UseCityHallResumes,
+                Config.UseCityHallTaxes)
+        else
+            QBCore.Functions.TriggerCallback("vms_cityhall:getBusinessData",
+                fetchCallback,
+                Config.UseCityHallResumes,
+                Config.UseCityHallTaxes)
+        end
     else
-      L2_2 = QBCore
-      L2_2 = L2_2.Functions
-      L2_2 = L2_2.TriggerCallback
-      L3_2 = "vms_cityhall:getBusinessData"
-      function L4_2(A0_3, A1_3)
-        local L2_3, L3_3, L4_3, L5_3, L6_3, L7_3
-        L2_3 = A0_3
-        L3_3 = A1_3
-        L4_3 = CL
-        L4_3 = L4_3.GetEmployees
-        function L5_3(A0_4)
-          local L1_4, L2_4, L3_4, L4_4, L5_4, L6_4
-          L1_4 = A0_2
-          currentGymManagement = L1_4
-          L1_4 = SendNUIMessage
-          L2_4 = {}
-          L2_4.action = "openManagementMenu"
-          L3_4 = stores
-          L4_4 = A0_2
-          L3_4 = L3_4[L4_4]
-          L2_4.storeData = L3_4
-          L3_4 = Config
-          L3_4 = L3_4.Gyms
-          L4_4 = A0_2
-          L3_4 = L3_4[L4_4]
-          L2_4.storeCfg = L3_4
-          L2_4.employees = A0_4
-          L3_4 = #A0_4
-          L2_4.employeesCount = L3_4
-          L3_4 = CL
-          L3_4 = L3_4.IsEmployee
-          L4_4 = Config
-          L4_4 = L4_4.Gyms
-          L5_4 = A0_2
-          L4_4 = L4_4[L5_4]
-          L4_4 = L4_4.ownerJob
-          L3_4 = L3_4(L4_4)
-          L2_4.isEmployee = L3_4
-          L3_4 = CL
-          L3_4 = L3_4.IsManager
-          L4_4 = Config
-          L4_4 = L4_4.Gyms
-          L5_4 = A0_2
-          L4_4 = L4_4[L5_4]
-          L4_4 = L4_4.ownerJob
-          L5_4 = A0_2
-          L3_4 = L3_4(L4_4, L5_4)
-          L2_4.isManager = L3_4
-          L3_4 = CL
-          L3_4 = L3_4.IsBoss
-          L4_4 = Config
-          L4_4 = L4_4.Gyms
-          L5_4 = A0_2
-          L4_4 = L4_4[L5_4]
-          L4_4 = L4_4.ownerJob
-          L5_4 = A0_2
-          L3_4 = L3_4(L4_4, L5_4)
-          L2_4.isBoss = L3_4
-          L3_4 = CL
-          L3_4 = L3_4.IsAllowedCityhall
-          L4_4 = Config
-          L4_4 = L4_4.Gyms
-          L5_4 = A0_2
-          L4_4 = L4_4[L5_4]
-          L4_4 = L4_4.ownerJob
-          L5_4 = A0_2
-          L3_4 = L3_4(L4_4, L5_4)
-          L2_4.cityhallGrades = L3_4
-          L3_4 = L1_2.requiredMembership
-          if L3_4 then
-            L3_4 = L1_2.allowSellMembership
-            if L3_4 then
-              L3_4 = L1_2.memberships
-              if L3_4 then
-                goto lbl_68
-              end
-            end
-          end
-          L3_4 = nil
-          ::lbl_68::
-          L2_4.membershipsList = L3_4
-          L3_4 = L1_2.allowSellProteins
-          if L3_4 then
-            L3_4 = L1_2.proteins
-            if L3_4 then
-              goto lbl_76
-            end
-          end
-          L3_4 = nil
-          ::lbl_76::
-          L2_4.proteinsList = L3_4
-          L3_4 = Config
-          L3_4 = L3_4.UseCityHallResumes
-          if L3_4 then
-            L3_4 = exports
-            L4_4 = Config
-            L4_4 = L4_4.VMSCityHallResource
-            L3_4 = L3_4[L4_4]
-            L4_4 = L3_4
-            L3_4 = L3_4.isResumesAllowed
-            L5_4 = Config
-            L5_4 = L5_4.Gyms
-            L6_4 = A0_2
-            L5_4 = L5_4[L6_4]
-            L5_4 = L5_4.ownerJob
-            L3_4 = L3_4(L4_4, L5_4)
-            if L3_4 then
-              goto lbl_95
-            end
-          end
-          L3_4 = false
-          ::lbl_95::
-          L2_4.isResumesAllowed = L3_4
-          L3_4 = L2_3
-          L2_4.resumes = L3_4
-          L3_4 = Config
-          L3_4 = L3_4.UseCityHallTaxes
-          L2_4.isTaxesAllowed = L3_4
-          L3_4 = L3_3
-          L2_4.taxes = L3_4
-          L1_4(L2_4)
-        end
-        L6_3 = Config
-        L6_3 = L6_3.Gyms
-        L7_3 = A0_2
-        L6_3 = L6_3[L7_3]
-        L6_3 = L6_3.ownerJob
-        L4_3(L5_3, L6_3)
-      end
-      L5_2 = Config
-      L5_2 = L5_2.UseCityHallResumes
-      L6_2 = Config
-      L6_2 = L6_2.UseCityHallTaxes
-      L2_2(L3_2, L4_2, L5_2, L6_2)
+        CL.GetEmployees(launchMenu, gymConfig.ownerJob)
     end
-  else
-    L2_2 = CL
-    L2_2 = L2_2.GetEmployees
-    function L3_2(A0_3)
-      local L1_3, L2_3, L3_3, L4_3, L5_3
-      L1_3 = A0_2
-      currentGymManagement = L1_3
-      L1_3 = SendNUIMessage
-      L2_3 = {}
-      L2_3.action = "openManagementMenu"
-      L3_3 = stores
-      L4_3 = A0_2
-      L3_3 = L3_3[L4_3]
-      L2_3.storeData = L3_3
-      L3_3 = Config
-      L3_3 = L3_3.Gyms
-      L4_3 = A0_2
-      L3_3 = L3_3[L4_3]
-      L2_3.storeCfg = L3_3
-      L2_3.employees = A0_3
-      L3_3 = #A0_3
-      L2_3.employeesCount = L3_3
-      L3_3 = CL
-      L3_3 = L3_3.IsEmployee
-      L4_3 = Config
-      L4_3 = L4_3.Gyms
-      L5_3 = A0_2
-      L4_3 = L4_3[L5_3]
-      L4_3 = L4_3.ownerJob
-      L3_3 = L3_3(L4_3)
-      L2_3.isEmployee = L3_3
-      L3_3 = CL
-      L3_3 = L3_3.IsManager
-      L4_3 = Config
-      L4_3 = L4_3.Gyms
-      L5_3 = A0_2
-      L4_3 = L4_3[L5_3]
-      L4_3 = L4_3.ownerJob
-      L5_3 = A0_2
-      L3_3 = L3_3(L4_3, L5_3)
-      L2_3.isManager = L3_3
-      L3_3 = CL
-      L3_3 = L3_3.IsBoss
-      L4_3 = Config
-      L4_3 = L4_3.Gyms
-      L5_3 = A0_2
-      L4_3 = L4_3[L5_3]
-      L4_3 = L4_3.ownerJob
-      L5_3 = A0_2
-      L3_3 = L3_3(L4_3, L5_3)
-      L2_3.isBoss = L3_3
-      L3_3 = L1_2.requiredMembership
-      if L3_3 then
-        L3_3 = L1_2.allowSellMembership
-        if L3_3 then
-          L3_3 = L1_2.memberships
-          if L3_3 then
-            goto lbl_58
-          end
-        end
-      end
-      L3_3 = nil
-      ::lbl_58::
-      L2_3.membershipsList = L3_3
-      L3_3 = L1_2.allowSellProteins
-      if L3_3 then
-        L3_3 = L1_2.proteins
-        if L3_3 then
-          goto lbl_66
-        end
-      end
-      L3_3 = nil
-      ::lbl_66::
-      L2_3.proteinsList = L3_3
-      L1_3(L2_3)
-    end
-    L4_2 = Config
-    L4_2 = L4_2.Gyms
-    L4_2 = L4_2[A0_2]
-    L4_2 = L4_2.ownerJob
-    L2_2(L3_2, L4_2)
-  end
-  L2_2 = SetNuiFocus
-  L3_2 = true
-  L4_2 = true
-  L2_2(L3_2, L4_2)
-  L2_2 = Config
-  L2_2 = L2_2.UseBuildInCompanyBalance
-  if not L2_2 then
-    L2_2 = Citizen
-    L2_2 = L2_2.Wait
-    L3_2 = 300
-    L2_2(L3_2)
-    L2_2 = TriggerServerEvent
-    L3_2 = Config
-    L3_2 = L3_2.ESXSocietyEvents
-    L3_2 = L3_2.check
-    L4_2 = Config
-    L4_2 = L4_2.Gyms
-    L4_2 = L4_2[A0_2]
-    L4_2 = L4_2.ownerJob
-    L2_2(L3_2, L4_2)
-  end
-end
-openBossMenu = L8_1
-function L8_1()
-  local L0_2, L1_2, L2_2
-  L0_2 = SendNUIMessage
-  L1_2 = {}
-  L1_2.action = "closeManagementMenu"
-  L0_2(L1_2)
-  currentBarberManagement = nil
-  L0_2 = SetNuiFocus
-  L1_2 = false
-  L2_2 = false
-  L0_2(L1_2, L2_2)
-end
-closeManagementMenu = L8_1
-L8_1 = RegisterNetEvent
-L9_1 = "flake_gym:cl:getMemberships"
-L8_1(L9_1)
-L8_1 = AddEventHandler
-L9_1 = "flake_gym:cl:getMemberships"
-function L10_1(A0_2)
-  local L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2
-  L6_1 = A0_2
-  L1_2 = {}
-  L7_1 = L1_2
-  L1_2 = pairs
-  L2_2 = L6_1
-  L1_2, L2_2, L3_2, L4_2 = L1_2(L2_2)
-  for L5_2, L6_2 in L1_2, L2_2, L3_2, L4_2 do
-    L8_2 = L6_2.name
-    L7_2 = L7_1
-    L9_2 = L6_2.time
-    L7_2[L8_2] = L9_2
-  end
-  L1_2 = currentShop
-  if L1_2 then
-    L1_2 = Config
-    L1_2 = L1_2.Gyms
-    L2_2 = currentShop
-    L1_2 = L1_2[L2_2]
-    L1_2 = L1_2.requiredMembership
-    if L1_2 then
-      L1_2 = SendNUIMessage
-      L2_2 = {}
-      L2_2.action = "updatePurchaseMenu"
-      L2_2.type = "membership"
-      L3_2 = Config
-      L3_2 = L3_2.Gyms
-      L4_2 = currentShop
-      L3_2 = L3_2[L4_2]
-      L4_2 = L3_2.requiredMembership
-      L3_2 = L7_1
-      L3_2 = L3_2[L4_2]
-      L2_2.myMembership = L3_2
-      L1_2(L2_2)
-    end
-  end
-end
-L8_1(L9_1, L10_1)
-function L8_1(A0_2)
-  local L1_2, L2_2
-  while true do
-    L1_2 = HasAnimDictLoaded
-    L2_2 = A0_2
-    L1_2 = L1_2(L2_2)
-    if L1_2 then
-      break
-    end
-    L1_2 = RequestAnimDict
-    L2_2 = A0_2
-    L1_2(L2_2)
-    L1_2 = Wait
-    L2_2 = 5
-    L1_2(L2_2)
-  end
-end
-loadAnimDict = L8_1
-function L8_1(A0_2)
-  local L1_2, L2_2
-  L1_2 = RequestModel
-  L2_2 = A0_2
-  L1_2(L2_2)
-  while true do
-    L1_2 = HasModelLoaded
-    L2_2 = A0_2
-    L1_2 = L1_2(L2_2)
-    if L1_2 then
-      break
-    end
-    L1_2 = Citizen
-    L1_2 = L1_2.Wait
-    L2_2 = 100
-    L1_2(L2_2)
-    L1_2 = RequestModel
-    L2_2 = A0_2
-    L1_2(L2_2)
-  end
-end
-requestProp = L8_1
-L8_1 = Citizen
-L8_1 = L8_1.CreateThread
-function L9_1()
-  local L0_2, L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2, L15_2, L16_2
-  L0_2 = Citizen
-  L0_2 = L0_2.Wait
-  L1_2 = 250
-  L0_2(L1_2)
-  L0_2 = pairs
-  L1_2 = Config
-  L1_2 = L1_2.Gyms
-  L0_2, L1_2, L2_2, L3_2 = L0_2(L1_2)
-  for L4_2, L5_2 in L0_2, L1_2, L2_2, L3_2 do
-    L6_2 = L5_2.blipCoords
-    if L6_2 then
-      L6_2 = L5_2.blipEnabled
-      if L6_2 then
-        L6_2 = AddBlipForCoord
-        L7_2 = L5_2.blipCoords
-        L6_2 = L6_2(L7_2)
-        L5_2._createdBlip = L6_2
-        L6_2 = SetBlipSprite
-        L7_2 = L5_2._createdBlip
-        L8_2 = Config
-        L8_2 = L8_2.Blip
-        L8_2 = L8_2.Sprite
-        L6_2(L7_2, L8_2)
-        L6_2 = SetBlipDisplay
-        L7_2 = L5_2._createdBlip
-        L8_2 = Config
-        L8_2 = L8_2.Blip
-        L8_2 = L8_2.Display
-        L6_2(L7_2, L8_2)
-        L6_2 = SetBlipScale
-        L7_2 = L5_2._createdBlip
-        L8_2 = Config
-        L8_2 = L8_2.Blip
-        L8_2 = L8_2.Scale
-        L6_2(L7_2, L8_2)
-        L6_2 = SetBlipColour
-        L7_2 = L5_2._createdBlip
-        L8_2 = Config
-        L8_2 = L8_2.Blip
-        L8_2 = L8_2.Color
-        L6_2(L7_2, L8_2)
-        L6_2 = SetBlipAsShortRange
-        L7_2 = L5_2._createdBlip
-        L8_2 = true
-        L6_2(L7_2, L8_2)
-        L6_2 = BeginTextCommandSetBlipName
-        L7_2 = "STRING"
-        L6_2(L7_2)
-        L6_2 = AddTextComponentString
-        L7_2 = L5_2.blipName
-        L6_2(L7_2)
-        L6_2 = EndTextCommandSetBlipName
-        L7_2 = L5_2._createdBlip
-        L6_2(L7_2)
-      end
-    end
-  end
-  L0_2 = Config
-  L0_2 = L0_2.UseTarget
-  if L0_2 then
-    L0_2 = Config
-    L0_2 = L0_2.TargetResource
-    if "ox_target" == L0_2 then
-      goto lbl_72
-    end
-  end
-  L0_2 = Config
-  L0_2 = L0_2.Menu
-  ::lbl_72::
-  if "ox_lib" == L0_2 then
-    L0_2 = LoadResourceFile
-    L1_2 = "ox_lib"
-    L2_2 = "init.lua"
-    L0_2 = L0_2(L1_2, L2_2)
-    L1_2 = assert
-    L2_2 = load
-    L3_2 = L0_2
-    L4_2 = "@@ox_lib/init.lua"
-    L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2, L15_2, L16_2 = L2_2(L3_2, L4_2)
-    L1_2 = L1_2(L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2, L15_2, L16_2)
-    L2_2 = L1_2
-    L2_2()
-  end
-  L0_2 = Config
-  L0_2 = L0_2.UseTarget
-  if L0_2 then
-    L0_2 = pairs
-    L1_2 = Config
-    L1_2 = L1_2.Gyms
-    L0_2, L1_2, L2_2, L3_2 = L0_2(L1_2)
-    for L4_2, L5_2 in L0_2, L1_2, L2_2, L3_2 do
-      L6_2 = L5_2.business
-      if L6_2 then
-        L6_2 = L5_2.ownerJob
-        if L6_2 then
-          L6_2 = L5_2.bossMenu
-          if L6_2 then
-            L6_2 = L5_2.bossMenu
-            L7_2 = CL
-            L7_2 = L7_2.Target
-            L8_2 = {}
-            L8_2.name = "bossmenu"
-            L9_2 = L5_2.bossMenu
-            L9_2 = L9_2.targetCoords
-            L8_2.coords = L9_2
-            L9_2 = L5_2.bossMenu
-            L9_2 = L9_2.targetSize
-            L8_2.size = L9_2
-            L9_2 = L5_2.ownerJob
-            L8_2.job = L9_2
-            L9_2 = TRANSLATE
-            L10_2 = "target.boss_menu"
-            L9_2 = L9_2(L10_2)
-            L8_2.label = L9_2
-            L8_2.icon = "fa-solid fa-dollar-sign"
-            function L9_2()
-              local L0_3, L1_3
-              L0_3 = openBossMenu
-              L1_3 = L4_2
-              L0_3(L1_3)
-            end
-            L7_2 = L7_2(L8_2, L9_2)
-            L6_2.targetId = L7_2
-          end
-        end
-      end
-      L6_2 = L5_2.shopMenu
-      if L6_2 then
-        L6_2 = L5_2.allowBuyMembership
-        if L6_2 then
-          L6_2 = L5_2.requiredMembership
-          if L6_2 then
-            goto lbl_136
-          end
-        end
-      end
-      L6_2 = L5_2.allowBuyProteins
-      ::lbl_136::
-      if L6_2 then
-        L6_2 = L5_2.shopMenu
-        L7_2 = CL
-        L7_2 = L7_2.Target
-        L8_2 = {}
-        L8_2.name = "shopmenu"
-        L9_2 = L5_2.shopMenu
-        L9_2 = L9_2.targetCoords
-        L8_2.coords = L9_2
-        L9_2 = L5_2.shopMenu
-        L9_2 = L9_2.targetSize
-        L8_2.size = L9_2
-        L9_2 = TRANSLATE
-        L10_2 = "target.shop_menu"
-        L9_2 = L9_2(L10_2)
-        L8_2.label = L9_2
-        L8_2.icon = "fa-solid fa-dollar-sign"
-        function L9_2()
-          local L0_3, L1_3
-          L0_3 = openPurchaseMenu
-          L1_3 = L4_2
-          L0_3(L1_3)
-        end
-        L7_2 = L7_2(L8_2, L9_2)
-        L6_2.targetId = L7_2
-      end
-      L6_2 = pairs
-      L7_2 = L5_2.points
-      L6_2, L7_2, L8_2, L9_2 = L6_2(L7_2)
-      for L10_2, L11_2 in L6_2, L7_2, L8_2, L9_2 do
-        L12_2 = CL
-        L12_2 = L12_2.Target
-        L13_2 = {}
-        L14_2 = L11_2.name
-        L13_2.name = L14_2
-        L14_2 = L11_2.activityCoord
-        L13_2.coords = L14_2
-        L14_2 = L11_2.targetSize
-        L13_2.size = L14_2
-        L14_2 = TRANSLATE
-        L15_2 = "target."
-        L16_2 = L11_2.name
-        L15_2 = L15_2 .. L16_2
-        L14_2 = L14_2(L15_2)
-        L13_2.label = L14_2
-        L13_2.icon = "fa-solid fa-dumbbell"
-        function L14_2()
-          local L0_3, L1_3, L2_3, L3_3
-          L0_3 = startAction
-          L1_3 = L4_2
-          L2_3 = L10_2
-          L3_3 = L11_2
-          L0_3(L1_3, L2_3, L3_3)
-        end
-        L12_2 = L12_2(L13_2, L14_2)
-        L11_2.targetId = L12_2
-      end
-    end
-  end
-end
-L8_1(L9_1)
-L8_1 = Citizen
-L8_1 = L8_1.CreateThread
-function L9_1()
-  local L0_2, L1_2, L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2, L15_2, L16_2, L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2
-  L0_2 = false
-  L1_2 = false
-  L2_2 = true
-  while true do
-    L3_2 = Config
-    L3_2 = L3_2.UseTarget
-    if L3_2 then
-      break
-    end
-    L0_2 = false
-    L2_2 = true
-    L3_2 = PlayerPedId
-    L3_2 = L3_2()
-    L4_2 = GetEntityCoords
-    L5_2 = L3_2
-    L4_2 = L4_2(L5_2)
-    L5_2 = pairs
-    L6_2 = Config
-    L6_2 = L6_2.Gyms
-    L5_2, L6_2, L7_2, L8_2 = L5_2(L6_2)
-    for L9_2, L10_2 in L5_2, L6_2, L7_2, L8_2 do
-      L11_2 = L10_2.blipCoords
-      L11_2 = L4_2 - L11_2
-      L11_2 = #L11_2
-      if L11_2 < 45.0 then
-        L2_2 = false
-        L12_2 = pairs
-        L13_2 = L10_2.points
-        L12_2, L13_2, L14_2, L15_2 = L12_2(L13_2)
-        for L16_2, L17_2 in L12_2, L13_2, L14_2, L15_2 do
-          L18_2 = L17_2.taken
-          if not L18_2 then
-            L18_2 = vec
-            L19_2 = L17_2.position
-            L19_2 = L19_2.x
-            L20_2 = L17_2.position
-            L20_2 = L20_2.y
-            L21_2 = L17_2.position
-            L21_2 = L21_2.z
-            L18_2 = L18_2(L19_2, L20_2, L21_2)
-            L18_2 = L4_2 - L18_2
-            L18_2 = #L18_2
-            L19_2 = Config
-            L19_2 = L19_2.DistanceView
-            if L18_2 < L19_2 then
-              L19_2 = Config
-              L19_2 = L19_2.UseMarkers
-              if L19_2 then
-                L19_2 = DrawMarker
-                L20_2 = Config
-                L20_2 = L20_2.Markers
-                L20_2 = L20_2.FreeSeat
-                L20_2 = L20_2.id
-                L21_2 = vec
-                L22_2 = L17_2.position
-                L22_2 = L22_2.x
-                L23_2 = L17_2.position
-                L23_2 = L23_2.y
-                L24_2 = L17_2.position
-                L24_2 = L24_2.z
-                L21_2 = L21_2(L22_2, L23_2, L24_2)
-                L22_2 = 0
-                L23_2 = 0
-                L24_2 = 0
-                L25_2 = Config
-                L25_2 = L25_2.Markers
-                L25_2 = L25_2.FreeSeat
-                L25_2 = L25_2.rotation
-                L25_2 = L25_2[1]
-                L26_2 = Config
-                L26_2 = L26_2.Markers
-                L26_2 = L26_2.FreeSeat
-                L26_2 = L26_2.rotation
-                L26_2 = L26_2[2]
-                L27_2 = Config
-                L27_2 = L27_2.Markers
-                L27_2 = L27_2.FreeSeat
-                L27_2 = L27_2.rotation
-                L27_2 = L27_2[3]
-                L28_2 = Config
-                L28_2 = L28_2.Markers
-                L28_2 = L28_2.FreeSeat
-                L28_2 = L28_2.size
-                L29_2 = Config
-                L29_2 = L29_2.Markers
-                L29_2 = L29_2.FreeSeat
-                L29_2 = L29_2.color
-                L29_2 = L29_2[1]
-                L30_2 = Config
-                L30_2 = L30_2.Markers
-                L30_2 = L30_2.FreeSeat
-                L30_2 = L30_2.color
-                L30_2 = L30_2[2]
-                L31_2 = Config
-                L31_2 = L31_2.Markers
-                L31_2 = L31_2.FreeSeat
-                L31_2 = L31_2.color
-                L31_2 = L31_2[3]
-                L32_2 = Config
-                L32_2 = L32_2.Markers
-                L32_2 = L32_2.FreeSeat
-                L32_2 = L32_2.color
-                L32_2 = L32_2[4]
-                L33_2 = Config
-                L33_2 = L33_2.Markers
-                L33_2 = L33_2.FreeSeat
-                L33_2 = L33_2.bobUpAndDown
-                L34_2 = false
-                L35_2 = false
-                L36_2 = Config
-                L36_2 = L36_2.Markers
-                L36_2 = L36_2.FreeSeat
-                L36_2 = L36_2.rotate
-                L37_2 = false
-                L38_2 = false
-                L39_2 = false
-                L19_2(L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2)
-              end
-              L19_2 = Config
-              L19_2 = L19_2.Use3DText
-              if L19_2 then
-                L19_2 = DrawText3D
-                L20_2 = L17_2.position
-                L20_2 = L20_2.x
-                L21_2 = L17_2.position
-                L21_2 = L21_2.y
-                L22_2 = L17_2.position
-                L22_2 = L22_2.z
-                L23_2 = TRANSLATE
-                L24_2 = "3dtext."
-                L25_2 = L17_2.name
-                L24_2 = L24_2 .. L25_2
-                L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2 = L23_2(L24_2)
-                L19_2(L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2)
-              end
-              L19_2 = 1.25
-              if L18_2 < L19_2 then
-                L19_2 = TRANSLATE
-                L20_2 = "textui."
-                L21_2 = L17_2.name
-                L20_2 = L20_2 .. L21_2
-                L19_2 = L19_2(L20_2)
-                L0_2 = L19_2
-                L19_2 = Config
-                L19_2 = L19_2.Core
-                if "ESX" == L19_2 then
-                  L19_2 = CL
-                  L19_2 = L19_2.TextUI
-                  L19_2 = L19_2.Enabled
-                  if not L19_2 then
-                    L19_2 = Config
-                    L19_2 = L19_2.UseHelpNotify
-                    if L19_2 then
-                      L19_2 = ESX
-                      L19_2 = L19_2.ShowHelpNotification
-                      L20_2 = TRANSLATE
-                      L21_2 = "help."
-                      L22_2 = L17_2.name
-                      L21_2 = L21_2 .. L22_2
-                      L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2 = L20_2(L21_2)
-                      L19_2(L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2)
-                    end
-                  end
-                end
-                L19_2 = IsControlJustPressed
-                L20_2 = 0
-                L21_2 = Config
-                L21_2 = L21_2.Keys
-                L21_2 = L21_2.enter
-                L19_2 = L19_2(L20_2, L21_2)
-                if L19_2 then
-                  L19_2 = startAction
-                  L20_2 = L9_2
-                  L21_2 = L16_2
-                  L22_2 = L17_2
-                  L19_2(L20_2, L21_2, L22_2)
-                  L0_2 = false
-                end
-              end
-            end
-          end
-        end
-      end
-      L12_2 = L10_2.business
-      if L12_2 then
-        L12_2 = L10_2.bossMenu
-        if L12_2 then
-          L12_2 = L10_2.bossMenu
-          L12_2 = L12_2.coords
-          if L12_2 then
-            L12_2 = L10_2.bossMenu
-            L12_2 = L12_2.coords
-            L12_2 = L12_2.xyz
-            L12_2 = L4_2 - L12_2
-            L12_2 = #L12_2
-            L13_2 = Config
-            L13_2 = L13_2.DistanceView
-            if L12_2 < L13_2 then
-              L13_2 = PlayerData
-              if L13_2 then
-                L13_2 = PlayerData
-                L13_2 = L13_2.job
-                if L13_2 then
-                  L13_2 = CL
-                  L13_2 = L13_2.IsEmployee
-                  L14_2 = L10_2.ownerJob
-                  L13_2 = L13_2(L14_2)
-                  if L13_2 then
-                    L2_2 = false
-                    L13_2 = Config
-                    L13_2 = L13_2.UseMarkers
-                    if L13_2 then
-                      L13_2 = DrawMarker
-                      L14_2 = Config
-                      L14_2 = L14_2.Markers
-                      L14_2 = L14_2.BossMenu
-                      L14_2 = L14_2.id
-                      L15_2 = L10_2.bossMenu
-                      L15_2 = L15_2.coords
-                      L15_2 = L15_2.xyz
-                      L16_2 = 0.0
-                      L17_2 = 0.0
-                      L18_2 = 0.0
-                      L19_2 = 0.0
-                      L20_2 = 0.0
-                      L21_2 = 0.0
-                      L22_2 = Config
-                      L22_2 = L22_2.Markers
-                      L22_2 = L22_2.BossMenu
-                      L22_2 = L22_2.size
-                      L23_2 = Config
-                      L23_2 = L23_2.Markers
-                      L23_2 = L23_2.BossMenu
-                      L23_2 = L23_2.color
-                      L23_2 = L23_2[1]
-                      L24_2 = Config
-                      L24_2 = L24_2.Markers
-                      L24_2 = L24_2.BossMenu
-                      L24_2 = L24_2.color
-                      L24_2 = L24_2[2]
-                      L25_2 = Config
-                      L25_2 = L25_2.Markers
-                      L25_2 = L25_2.BossMenu
-                      L25_2 = L25_2.color
-                      L25_2 = L25_2[3]
-                      L26_2 = Config
-                      L26_2 = L26_2.Markers
-                      L26_2 = L26_2.BossMenu
-                      L26_2 = L26_2.color
-                      L26_2 = L26_2[4]
-                      L27_2 = Config
-                      L27_2 = L27_2.Markers
-                      L27_2 = L27_2.BossMenu
-                      L27_2 = L27_2.bobUpAndDown
-                      L28_2 = false
-                      L29_2 = false
-                      L30_2 = Config
-                      L30_2 = L30_2.Markers
-                      L30_2 = L30_2.BossMenu
-                      L30_2 = L30_2.rotate
-                      L31_2 = false
-                      L32_2 = false
-                      L33_2 = false
-                      L13_2(L14_2, L15_2, L16_2, L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2)
-                    end
-                    L13_2 = Config
-                    L13_2 = L13_2.Use3DText
-                    if L13_2 then
-                      L13_2 = DrawText3D
-                      L14_2 = L10_2.bossMenu
-                      L14_2 = L14_2.coords
-                      L14_2 = L14_2.x
-                      L15_2 = L10_2.bossMenu
-                      L15_2 = L15_2.coords
-                      L15_2 = L15_2.y
-                      L16_2 = L10_2.bossMenu
-                      L16_2 = L16_2.coords
-                      L16_2 = L16_2.z
-                      L17_2 = TRANSLATE
-                      L18_2 = "3dtext.boss_menu"
-                      L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2 = L17_2(L18_2)
-                      L13_2(L14_2, L15_2, L16_2, L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2)
-                    end
-                    L13_2 = Config
-                    L13_2 = L13_2.DistanceAccess
-                    if L12_2 < L13_2 then
-                      L13_2 = TRANSLATE
-                      L14_2 = "textui.boss_menu"
-                      L13_2 = L13_2(L14_2)
-                      L0_2 = L13_2
-                      L13_2 = Config
-                      L13_2 = L13_2.Core
-                      if "ESX" == L13_2 then
-                        L13_2 = CL
-                        L13_2 = L13_2.TextUI
-                        L13_2 = L13_2.Enabled
-                        if not L13_2 then
-                          L13_2 = Config
-                          L13_2 = L13_2.UseHelpNotify
-                          if L13_2 then
-                            L13_2 = ESX
-                            L13_2 = L13_2.ShowHelpNotification
-                            L14_2 = TRANSLATE
-                            L15_2 = "help.boss_menu"
-                            L14_2, L15_2, L16_2, L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2 = L14_2(L15_2)
-                            L13_2(L14_2, L15_2, L16_2, L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2)
-                          end
-                        end
-                      end
-                      L13_2 = IsControlJustPressed
-                      L14_2 = 0
-                      L15_2 = 38
-                      L13_2 = L13_2(L14_2, L15_2)
-                      if L13_2 then
-                        L13_2 = openBossMenu
-                        L14_2 = L9_2
-                        L13_2(L14_2)
-                        L0_2 = false
-                      end
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
-      L12_2 = L10_2.shopMenu
-      if L12_2 then
-        L12_2 = L10_2.shopMenu
-        L12_2 = L12_2.coords
-        if L12_2 then
-          L12_2 = L10_2.allowBuyMembership
-          if not L12_2 then
-            L12_2 = L10_2.allowBuyProteins
-            if not L12_2 then
-              goto lbl_466
-            end
-          end
-          L12_2 = L10_2.shopMenu
-          L12_2 = L12_2.coords
-          L12_2 = L12_2.xyz
-          L12_2 = L4_2 - L12_2
-          L12_2 = #L12_2
-          L13_2 = Config
-          L13_2 = L13_2.DistanceView
-          if L12_2 < L13_2 then
-            L2_2 = false
-            L13_2 = Config
-            L13_2 = L13_2.UseMarkers
-            if L13_2 then
-              L13_2 = DrawMarker
-              L14_2 = Config
-              L14_2 = L14_2.Markers
-              L14_2 = L14_2.ShopMenu
-              L14_2 = L14_2.id
-              L15_2 = L10_2.shopMenu
-              L15_2 = L15_2.coords
-              L15_2 = L15_2.xyz
-              L16_2 = 0.0
-              L17_2 = 0.0
-              L18_2 = 0.0
-              L19_2 = 0.0
-              L20_2 = 0.0
-              L21_2 = 0.0
-              L22_2 = Config
-              L22_2 = L22_2.Markers
-              L22_2 = L22_2.ShopMenu
-              L22_2 = L22_2.size
-              L23_2 = Config
-              L23_2 = L23_2.Markers
-              L23_2 = L23_2.ShopMenu
-              L23_2 = L23_2.color
-              L23_2 = L23_2[1]
-              L24_2 = Config
-              L24_2 = L24_2.Markers
-              L24_2 = L24_2.ShopMenu
-              L24_2 = L24_2.color
-              L24_2 = L24_2[2]
-              L25_2 = Config
-              L25_2 = L25_2.Markers
-              L25_2 = L25_2.ShopMenu
-              L25_2 = L25_2.color
-              L25_2 = L25_2[3]
-              L26_2 = Config
-              L26_2 = L26_2.Markers
-              L26_2 = L26_2.ShopMenu
-              L26_2 = L26_2.color
-              L26_2 = L26_2[4]
-              L27_2 = Config
-              L27_2 = L27_2.Markers
-              L27_2 = L27_2.ShopMenu
-              L27_2 = L27_2.bobUpAndDown
-              L28_2 = false
-              L29_2 = false
-              L30_2 = Config
-              L30_2 = L30_2.Markers
-              L30_2 = L30_2.ShopMenu
-              L30_2 = L30_2.rotate
-              L31_2 = false
-              L32_2 = false
-              L33_2 = false
-              L13_2(L14_2, L15_2, L16_2, L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2)
-            end
-            L13_2 = Config
-            L13_2 = L13_2.Use3DText
-            if L13_2 then
-              L13_2 = DrawText3D
-              L14_2 = L10_2.bossMenu
-              L14_2 = L14_2.coords
-              L14_2 = L14_2.x
-              L15_2 = L10_2.bossMenu
-              L15_2 = L15_2.coords
-              L15_2 = L15_2.y
-              L16_2 = L10_2.bossMenu
-              L16_2 = L16_2.coords
-              L16_2 = L16_2.z
-              L17_2 = TRANSLATE
-              L18_2 = "3dtext.shop_menu"
-              L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2 = L17_2(L18_2)
-              L13_2(L14_2, L15_2, L16_2, L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2)
-            end
-            L13_2 = Config
-            L13_2 = L13_2.DistanceAccess
-            if L12_2 < L13_2 then
-              L13_2 = TRANSLATE
-              L14_2 = "textui.shop_menu"
-              L13_2 = L13_2(L14_2)
-              L0_2 = L13_2
-              L13_2 = Config
-              L13_2 = L13_2.Core
-              if "ESX" == L13_2 then
-                L13_2 = CL
-                L13_2 = L13_2.TextUI
-                L13_2 = L13_2.Enabled
-                if not L13_2 then
-                  L13_2 = Config
-                  L13_2 = L13_2.UseHelpNotify
-                  if L13_2 then
-                    L13_2 = ESX
-                    L13_2 = L13_2.ShowHelpNotification
-                    L14_2 = TRANSLATE
-                    L15_2 = "help.shop_menu"
-                    L14_2, L15_2, L16_2, L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2 = L14_2(L15_2)
-                    L13_2(L14_2, L15_2, L16_2, L17_2, L18_2, L19_2, L20_2, L21_2, L22_2, L23_2, L24_2, L25_2, L26_2, L27_2, L28_2, L29_2, L30_2, L31_2, L32_2, L33_2, L34_2, L35_2, L36_2, L37_2, L38_2, L39_2)
-                  end
-                end
-              end
-              L13_2 = IsControlJustPressed
-              L14_2 = 0
-              L15_2 = 38
-              L13_2 = L13_2(L14_2, L15_2)
-              if L13_2 then
-                L13_2 = openPurchaseMenu
-                L14_2 = L9_2
-                L13_2(L14_2)
-                L0_2 = false
-              end
-            end
-          end
-        end
-      end
-      ::lbl_466::
-    end
-    L5_2 = CL
-    L5_2 = L5_2.TextUI
-    L5_2 = L5_2.Enabled
-    if L5_2 then
-      if L0_2 and not L1_2 then
-        L1_2 = true
-        L5_2 = CL
-        L5_2 = L5_2.TextUI
-        L5_2 = L5_2.Open
-        L6_2 = L0_2
-        L5_2(L6_2)
-      elseif not L0_2 and L1_2 then
-        L1_2 = false
-        L5_2 = CL
-        L5_2 = L5_2.TextUI
-        L5_2 = L5_2.Close
-        L5_2()
-      end
-    end
-    L5_2 = Citizen
-    L5_2 = L5_2.Wait
-    if L2_2 then
-      L6_2 = 2000
-      if L6_2 then
-        goto lbl_502
-      end
-    end
-    L6_2 = 1
-    ::lbl_502::
-    L5_2(L6_2)
-  end
-end
-L8_1(L9_1)
-function L8_1(A0_2)
-  local L1_2, L2_2, L3_2, L4_2, L5_2
-  L1_2 = waitingForLoadAfterRestart
-  if L1_2 then
-    return
-  end
-  L1_2 = Config
-  L1_2 = L1_2.Gyms
-  L1_2 = L1_2[A0_2]
-  if not L1_2 then
-    return
-  end
-  L2_2 = {}
-  L2_2.action = "openPurchaseMenu"
-  L3_2 = L1_2.requiredMembership
-  if L3_2 then
-    L3_2 = L1_2.allowBuyMembership
-    if L3_2 then
-      L2_2.useMemberships = true
-      L3_2 = L1_2.memberships
-      L2_2.membershipsList = L3_2
-      L4_2 = L1_2.requiredMembership
-      L3_2 = L7_1
-      L3_2 = L3_2[L4_2]
-      L2_2.myMembership = L3_2
-    end
-  end
-  L3_2 = L1_2.allowBuyProteins
-  if L3_2 then
-    L2_2.useProteins = true
-    L3_2 = L1_2.proteins
-    L2_2.proteinsList = L3_2
-  end
-  L3_2 = L1_2.allowBuyMembership
-  if not L3_2 then
-    L3_2 = L1_2.allowBuyProteins
-    if not L3_2 then
-      goto lbl_51
-    end
-  end
-  currentShop = A0_2
-  L3_2 = Citizen
-  L3_2 = L3_2.Wait
-  L4_2 = 100
-  L3_2(L4_2)
-  L3_2 = SetNuiFocus
-  L4_2 = true
-  L5_2 = true
-  L3_2(L4_2, L5_2)
-  L3_2 = SendNUIMessage
-  L4_2 = L2_2
-  L3_2(L4_2)
-  ::lbl_51::
-end
-openPurchaseMenu = L8_1
-function L8_1(A0_2)
-  local L1_2, L2_2, L3_2, L4_2, L5_2
-  if not A0_2 then
-    return
-  end
-  L1_2 = currentShop
-  if not L1_2 then
-    return
-  end
-  L1_2 = Config
-  L1_2 = L1_2.Gyms
-  L2_2 = currentShop
-  L1_2 = L1_2[L2_2]
-  if not L1_2 then
-    return
-  end
-  L2_2 = L1_2.proteins
-  if not L2_2 then
-    return
-  end
-  L2_2 = L1_2.allowBuyProteins
-  if not L2_2 then
-    return
-  end
-  L2_2 = TriggerServerEvent
-  L3_2 = "flake_gym:sv:buyProtein"
-  L4_2 = currentShop
-  L5_2 = A0_2
-  L2_2(L3_2, L4_2, L5_2)
-end
-buyProtein = L8_1
-function L8_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2
-  if not A0_2 and not A1_2 then
-    return
-  end
-  L2_2 = currentShop
-  if not L2_2 then
-    return
-  end
-  L2_2 = Config
-  L2_2 = L2_2.Gyms
-  L3_2 = currentShop
-  L2_2 = L2_2[L3_2]
-  if not L2_2 then
-    return
-  end
-  L3_2 = L2_2.requiredMembership
-  if not L3_2 then
-    return
-  end
-  L3_2 = L2_2.allowBuyMembership
-  if not L3_2 then
-    return
-  end
-  L3_2 = nil
-  L4_2 = pairs
-  L5_2 = L2_2.memberships
-  L4_2, L5_2, L6_2, L7_2 = L4_2(L5_2)
-  for L8_2, L9_2 in L4_2, L5_2, L6_2, L7_2 do
-    L10_2 = L9_2.days
-    if L10_2 == A0_2 then
-      L10_2 = L9_2.hours
-      if L10_2 == A1_2 then
-        L3_2 = L9_2
-        break
-      end
-    end
-  end
-  L4_2 = TriggerServerEvent
-  L5_2 = "flake_gym:sv:acceptMembership"
-  L6_2 = currentShop
-  L7_2 = L2_2.requiredMembership
-  L8_2 = L3_2
-  L4_2(L5_2, L6_2, L7_2, L8_2)
-end
-buyMembership = L8_1
-function L8_1(A0_2, A1_2, A2_2)
-  local L3_2, L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2
-  L3_2 = L1_1
-  if L3_2 then
-    return
-  end
-  L3_2 = Config
-  L3_2 = L3_2.EnableMemberships
-  if L3_2 then
-    L3_2 = Config
-    L3_2 = L3_2.Gyms
-    L3_2 = L3_2[A0_2]
-    L3_2 = L3_2.requiredMembership
-    if L3_2 then
-      L3_2 = Config
-      L3_2 = L3_2.Gyms
-      L3_2 = L3_2[A0_2]
-      L4_2 = L3_2.requiredMembership
-      L3_2 = L7_1
-      L3_2 = L3_2[L4_2]
-      if not L3_2 then
-        L3_2 = Config
-        L3_2 = L3_2.AutoMembershipForEmployees
-        if L3_2 then
-          L3_2 = PlayerData
-          L3_2 = L3_2.job
-          L3_2 = L3_2.name
-          L4_2 = Config
-          L4_2 = L4_2.Gyms
-          L4_2 = L4_2[A0_2]
-          L4_2 = L4_2.ownerJob
-          if L3_2 == L4_2 then
-            goto lbl_51
-        end
-        else
-          L3_2 = CL
-          L3_2 = L3_2.Notification
-          L4_2 = TRANSLATE
-          L5_2 = "notify.title.gym"
-          L4_2 = L4_2(L5_2)
-          L5_2 = TRANSLATE
-          L6_2 = "no_membership"
-          L5_2 = L5_2(L6_2)
-          L6_2 = 3500
-          L7_2 = "fa-solid fa-dumbbell"
-          L8_2 = "error"
-          return L3_2(L4_2, L5_2, L6_2, L7_2, L8_2)
-        end
-      end
-    end
-  end
-  ::lbl_51::
-  L3_2 = A2_2.taken
-  if L3_2 then
-    L3_2 = CL
-    L3_2 = L3_2.Notification
-    L4_2 = TRANSLATE
-    L5_2 = "notify.title.gym"
-    L4_2 = L4_2(L5_2)
-    L5_2 = TRANSLATE
-    L6_2 = "place_taken"
-    L5_2 = L5_2(L6_2)
-    L6_2 = 3500
-    L7_2 = "fa-solid fa-dumbbell"
-    L8_2 = "error"
-    return L3_2(L4_2, L5_2, L6_2, L7_2, L8_2)
-  end
-  L0_1 = A0_2
-  L1_1 = A1_2
-  L2_1 = A2_2
-  removeStrength = false
-  L3_2 = A2_2.activityCoord
-  L3_2 = L3_2.w
-  if L3_2 then
-    L3_2 = SetEntityHeading
-    L4_2 = PlayerPedId
-    L4_2 = L4_2()
-    L5_2 = L2_1.activityCoord
-    L5_2 = L5_2.w
-    L3_2(L4_2, L5_2)
-  end
-  L3_2 = A2_2.activityCoord
-  L3_2 = L3_2.x
-  if L3_2 then
-    L3_2 = A2_2.activityCoord
-    L3_2 = L3_2.y
-    if L3_2 then
-      L3_2 = A2_2.activityCoord
-      L3_2 = L3_2.z
-      if L3_2 then
-        L3_2 = SetEntityCoords
-        L4_2 = PlayerPedId
-        L4_2 = L4_2()
-        L5_2 = vec
-        L6_2 = A2_2.activityCoord
-        L6_2 = L6_2.x
-        L7_2 = A2_2.activityCoord
-        L7_2 = L7_2.y
-        L8_2 = A2_2.activityCoord
-        L8_2 = L8_2.z
-        L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2 = L5_2(L6_2, L7_2, L8_2)
-        L3_2(L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2)
-      end
-    end
-  end
-  L3_2 = FreezeEntityPosition
-  L4_2 = PlayerPedId
-  L4_2 = L4_2()
-  L5_2 = true
-  L3_2(L4_2, L5_2)
-  L3_2 = SetEntityCollision
-  L4_2 = PlayerPedId
-  L4_2 = L4_2()
-  L5_2 = false
-  L6_2 = false
-  L3_2(L4_2, L5_2, L6_2)
-  L3_2 = pairs
-  L4_2 = Config
-  L4_2 = L4_2.Animations
-  L5_2 = A2_2.name
-  L4_2 = L4_2[L5_2]
-  L3_2, L4_2, L5_2, L6_2 = L3_2(L4_2)
-  for L7_2, L8_2 in L3_2, L4_2, L5_2, L6_2 do
-    L9_2 = loadAnimDict
-    L10_2 = L8_2[1]
-    L9_2(L10_2)
-  end
-  L3_2 = TriggerServerEvent
-  L4_2 = "flake_gym:sv:setTaken"
-  L5_2 = L0_1
-  L6_2 = L1_1
-  L7_2 = true
-  L3_2(L4_2, L5_2, L6_2, L7_2)
-  L3_2 = SendNUIMessage
-  L4_2 = {}
-  L4_2.action = "openHelpKeys"
-  L5_2 = GetPlayerStamina
-  L6_2 = PlayerId
-  L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2 = L6_2()
-  L5_2 = L5_2(L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2)
-  L4_2.stamina = L5_2
-  L3_2(L4_2)
-  L3_2 = Config
-  L3_2 = L3_2.Animations
-  L4_2 = A2_2.name
-  L3_2 = L3_2[L4_2]
-  L3_2 = L3_2.enter
-  if L3_2 then
-    L3_2 = TaskPlayAnim
-    L4_2 = PlayerPedId
-    L4_2 = L4_2()
-    L5_2 = Config
-    L5_2 = L5_2.Animations
-    L6_2 = A2_2.name
-    L5_2 = L5_2[L6_2]
-    L5_2 = L5_2.enter
-    L5_2 = L5_2[1]
-    L6_2 = Config
-    L6_2 = L6_2.Animations
-    L7_2 = A2_2.name
-    L6_2 = L6_2[L7_2]
-    L6_2 = L6_2.enter
-    L6_2 = L6_2[2]
-    L7_2 = 8.0
-    L8_2 = -8.0
-    L9_2 = Config
-    L9_2 = L9_2.Animations
-    L10_2 = A2_2.name
-    L9_2 = L9_2[L10_2]
-    L9_2 = L9_2.enter
-    L9_2 = L9_2[3]
-    L10_2 = 0
-    L11_2 = 0.0
-    L12_2 = 0
-    L13_2 = 0
-    L14_2 = 0
-    L3_2(L4_2, L5_2, L6_2, L7_2, L8_2, L9_2, L10_2, L11_2, L12_2, L13_2, L14_2)
-    L3_2 = Citizen
-    L3_2 = L3_2.Wait
-    L4_2 = Config
-    L4_2 = L4_2.Animations
-    L5_2 = A2_2.name
-    L4_2 = L4_2[L5_2]
-    L4_2 = L4_2.enter
-    L4_2 = L4_2[3]
-    L3_2(L4_2)
-  end
-  L3_2 = Citizen
-  L3_2 = L3_2.CreateThread
-  function L4_2()
-    local L0_3, L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3
-    L0_3 = TaskPlayAnim
-    L1_3 = PlayerPedId
-    L1_3 = L1_3()
-    L2_3 = Config
-    L2_3 = L2_3.Animations
-    L3_3 = L2_1.name
-    L2_3 = L2_3[L3_3]
-    L2_3 = L2_3.idle
-    L2_3 = L2_3[1]
-    L3_3 = Config
-    L3_3 = L3_3.Animations
-    L4_3 = L2_1.name
-    L3_3 = L3_3[L4_3]
-    L3_3 = L3_3.idle
-    L3_3 = L3_3[2]
-    L4_3 = 8.0
-    L5_3 = -8.0
-    L6_3 = Config
-    L6_3 = L6_3.Animations
-    L7_3 = L2_1.name
-    L6_3 = L6_3[L7_3]
-    L6_3 = L6_3.idle
-    L6_3 = L6_3[3]
-    L7_3 = 1
-    L8_3 = 0.0
-    L9_3 = 0
-    L10_3 = 0
-    L11_3 = 0
-    L0_3(L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3)
-    L0_3 = L2_1.prop
-    if L0_3 then
-      L0_3 = requestProp
-      L1_3 = GetHashKey
-      L2_3 = L2_1.prop
-      L2_3 = L2_3.name
-      L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3 = L1_3(L2_3)
-      L0_3(L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3)
-      L0_3 = GetEntityCoords
-      L1_3 = PlayerPedId
-      L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3 = L1_3()
-      L0_3 = L0_3(L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3)
-      L1_3 = CreateObject
-      L2_3 = GetHashKey
-      L3_3 = L2_1.prop
-      L3_3 = L3_3.name
-      L2_3 = L2_3(L3_3)
-      L3_3 = L0_3
-      L4_3 = true
-      L5_3 = true
-      L6_3 = true
-      L1_3 = L1_3(L2_3, L3_3, L4_3, L5_3, L6_3)
-      L3_1 = L1_3
-      L1_3 = AttachEntityToEntity
-      L2_3 = L3_1
-      L3_3 = PlayerPedId
-      L3_3 = L3_3()
-      L4_3 = GetPedBoneIndex
-      L5_3 = PlayerPedId
-      L5_3 = L5_3()
-      L6_3 = L2_1.prop
-      L6_3 = L6_3.attachBone
-      L4_3 = L4_3(L5_3, L6_3)
-      L5_3 = L2_1.prop
-      L5_3 = L5_3.placement
-      L5_3 = L5_3[1]
-      L5_3 = L5_3 + 0.0
-      L6_3 = L2_1.prop
-      L6_3 = L6_3.placement
-      L6_3 = L6_3[2]
-      L6_3 = L6_3 + 0.0
-      L7_3 = L2_1.prop
-      L7_3 = L7_3.placement
-      L7_3 = L7_3[3]
-      L7_3 = L7_3 + 0.0
-      L8_3 = L2_1.prop
-      L8_3 = L8_3.placement
-      L8_3 = L8_3[4]
-      L8_3 = L8_3 + 0.0
-      L9_3 = L2_1.prop
-      L9_3 = L9_3.placement
-      L9_3 = L9_3[5]
-      L9_3 = L9_3 + 0.0
-      L10_3 = L2_1.prop
-      L10_3 = L10_3.placement
-      L10_3 = L10_3[6]
-      L10_3 = L10_3 + 0.0
-      L11_3 = true
-      L12_3 = true
-      L13_3 = false
-      L14_3 = false
-      L15_3 = 1
-      L16_3 = true
-      L1_3(L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3)
-      L1_3 = SetModelAsNoLongerNeeded
-      L2_3 = L3_1
-      L1_3(L2_3)
-    end
-    L0_3 = L2_1.prop2
-    if L0_3 then
-      L0_3 = requestProp
-      L1_3 = GetHashKey
-      L2_3 = L2_1.prop2
-      L2_3 = L2_3.name
-      L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3 = L1_3(L2_3)
-      L0_3(L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3)
-      L0_3 = GetEntityCoords
-      L1_3 = PlayerPedId
-      L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3 = L1_3()
-      L0_3 = L0_3(L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3)
-      L1_3 = CreateObject
-      L2_3 = GetHashKey
-      L3_3 = L2_1.prop2
-      L3_3 = L3_3.name
-      L2_3 = L2_3(L3_3)
-      L3_3 = L0_3
-      L4_3 = true
-      L5_3 = true
-      L6_3 = true
-      L1_3 = L1_3(L2_3, L3_3, L4_3, L5_3, L6_3)
-      L4_1 = L1_3
-      L1_3 = AttachEntityToEntity
-      L2_3 = L4_1
-      L3_3 = PlayerPedId
-      L3_3 = L3_3()
-      L4_3 = GetPedBoneIndex
-      L5_3 = PlayerPedId
-      L5_3 = L5_3()
-      L6_3 = L2_1.prop2
-      L6_3 = L6_3.attachBone
-      L4_3 = L4_3(L5_3, L6_3)
-      L5_3 = L2_1.prop2
-      L5_3 = L5_3.placement
-      L5_3 = L5_3[1]
-      L5_3 = L5_3 + 0.0
-      L6_3 = L2_1.prop2
-      L6_3 = L6_3.placement
-      L6_3 = L6_3[2]
-      L6_3 = L6_3 + 0.0
-      L7_3 = L2_1.prop2
-      L7_3 = L7_3.placement
-      L7_3 = L7_3[3]
-      L7_3 = L7_3 + 0.0
-      L8_3 = L2_1.prop2
-      L8_3 = L8_3.placement
-      L8_3 = L8_3[4]
-      L8_3 = L8_3 + 0.0
-      L9_3 = L2_1.prop2
-      L9_3 = L9_3.placement
-      L9_3 = L9_3[5]
-      L9_3 = L9_3 + 0.0
-      L10_3 = L2_1.prop2
-      L10_3 = L10_3.placement
-      L10_3 = L10_3[6]
-      L10_3 = L10_3 + 0.0
-      L11_3 = true
-      L12_3 = true
-      L13_3 = false
-      L14_3 = false
-      L15_3 = 1
-      L16_3 = true
-      L1_3(L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3)
-      L1_3 = SetModelAsNoLongerNeeded
-      L2_3 = L4_1
-      L1_3(L2_3)
-    end
-    while true do
-      L0_3 = L2_1
-      if not L0_3 then
-        break
-      end
-      L0_3 = IsControlJustPressed
-      L1_3 = 0
-      L2_3 = Config
-      L2_3 = L2_3.Keys
-      L2_3 = L2_3.train
-      L0_3 = L0_3(L1_3, L2_3)
-      if L0_3 then
-        L0_3 = GetPlayerStamina
-        L1_3 = PlayerId
-        L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3 = L1_3()
-        L0_3 = L0_3(L1_3, L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3, L13_3, L14_3, L15_3, L16_3)
-        L5_1 = L0_3
-        L0_3 = false
-        L1_3 = L5_1
-        L2_3 = getSkill
-        L3_3 = "condition"
-        L2_3 = L2_3(L3_3)
-        if L2_3 >= 10.0 then
-          L2_3 = L2_1.removeStamina
-          L2_3 = L2_3 * 100
-          L3_3 = getSkill
-          L4_3 = "condition"
-          L3_3 = L3_3(L4_3)
-          L2_3 = L2_3 / L3_3
-          if L2_3 then
-            goto lbl_222
-          end
-        end
-        L2_3 = getSkill
-        L3_3 = "condition"
-        L2_3 = L2_3(L3_3)
-        L2_3 = L2_1.removeStamina
-        L2_3 = L2_3 < 10.0 and L2_3
-        ::lbl_222::
-        if L1_3 > L2_3 then
-          L1_3 = Config
-          L1_3 = L1_3.UseSkillbar
-          if L1_3 then
-            L1_3 = Config
-            L1_3 = L1_3.Skillbar
-            L2_3 = L2_1.name
-            function L3_3(A0_4)
-              local L1_4
-              L1_4 = false
-              L0_3 = L1_4
-              if not A0_4 then
-                L1_4 = true
-                L0_3 = L1_4
-              end
-            end
-            L1_3(L2_3, L3_3)
-          end
-          if L0_3 then
-            goto lbl_427
-          end
-          L1_3 = Config
-          L1_3 = L1_3.UseProgressbar
-          if L1_3 then
-            L1_3 = Config
-            L1_3 = L1_3.Progressbar
-            L2_3 = L2_1.name
-            L3_3 = Config
-            L3_3 = L3_3.Animations
-            L4_3 = L2_1.name
-            L3_3 = L3_3[L4_3]
-            L3_3 = L3_3.training
-            L3_3 = L3_3[3]
-            L1_3(L2_3, L3_3)
-          end
-          L1_3 = TaskPlayAnim
-          L2_3 = PlayerPedId
-          L2_3 = L2_3()
-          L3_3 = Config
-          L3_3 = L3_3.Animations
-          L4_3 = L2_1.name
-          L3_3 = L3_3[L4_3]
-          L3_3 = L3_3.training
-          L3_3 = L3_3[1]
-          L4_3 = Config
-          L4_3 = L4_3.Animations
-          L5_3 = L2_1.name
-          L4_3 = L4_3[L5_3]
-          L4_3 = L4_3.training
-          L4_3 = L4_3[2]
-          L5_3 = 8.0
-          L6_3 = -8.0
-          L7_3 = Config
-          L7_3 = L7_3.Animations
-          L8_3 = L2_1.name
-          L7_3 = L7_3[L8_3]
-          L7_3 = L7_3.training
-          L7_3 = L7_3[3]
-          L8_3 = 0
-          L9_3 = 0.0
-          L10_3 = 0
-          L11_3 = 0
-          L12_3 = 0
-          L1_3(L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3)
-          L1_3 = Citizen
-          L1_3 = L1_3.Wait
-          L2_3 = Config
-          L2_3 = L2_3.Animations
-          L3_3 = L2_1.name
-          L2_3 = L2_3[L3_3]
-          L2_3 = L2_3.training
-          L2_3 = L2_3[3]
-          L1_3(L2_3)
-          L1_3 = TaskPlayAnim
-          L2_3 = PlayerPedId
-          L2_3 = L2_3()
-          L3_3 = Config
-          L3_3 = L3_3.Animations
-          L4_3 = L2_1.name
-          L3_3 = L3_3[L4_3]
-          L3_3 = L3_3.idle
-          L3_3 = L3_3[1]
-          L4_3 = Config
-          L4_3 = L4_3.Animations
-          L5_3 = L2_1.name
-          L4_3 = L4_3[L5_3]
-          L4_3 = L4_3.idle
-          L4_3 = L4_3[2]
-          L5_3 = 8.0
-          L6_3 = -8.0
-          L7_3 = Config
-          L7_3 = L7_3.Animations
-          L8_3 = L2_1.name
-          L7_3 = L7_3[L8_3]
-          L7_3 = L7_3.idle
-          L7_3 = L7_3[3]
-          L8_3 = 1
-          L9_3 = 0.0
-          L10_3 = 0
-          L11_3 = 0
-          L12_3 = 0
-          L1_3(L2_3, L3_3, L4_3, L5_3, L6_3, L7_3, L8_3, L9_3, L10_3, L11_3, L12_3)
-          L1_3 = SetPlayerStamina
-          L2_3 = PlayerId
-          L2_3 = L2_3()
-          L3_3 = L5_1
-          L4_3 = getSkill
-          L5_3 = "condition"
-          L4_3 = L4_3(L5_3)
-          if L4_3 >= 10.0 then
-            L4_3 = L2_1.removeStamina
-            L4_3 = L4_3 * 100
-            L5_3 = getSkill
-            L6_3 = "condition"
-            L5_3 = L5_3(L6_3)
-            L4_3 = L4_3 / L5_3
-            if L4_3 then
-              goto lbl_346
-            end
-          end
-          L4_3 = getSkill
-          L5_3 = "condition"
-          L4_3 = L4_3(L5_3)
-          L4_3 = L2_1.removeStamina
-          L4_3 = L4_3 < 10.0 and L4_3
-          ::lbl_346::
-          L3_3 = L3_3 - L4_3
-          L1_3(L2_3, L3_3)
-          L1_3 = L2_1.addSkill
-          if not L1_3 then
-            goto lbl_427
-          end
-          L1_3 = L2_1.addSkill
-          L1_3 = L1_3.skill
-          if not L1_3 then
-            goto lbl_427
-          end
-          L1_3 = L2_1.addSkill
-          L1_3 = L1_3.value
-          if not L1_3 then
-            goto lbl_427
-          end
-          L1_3 = type
-          L2_3 = L2_1.addSkill
-          L2_3 = L2_3.value
-          L1_3 = L1_3(L2_3)
-          if "number" == L1_3 then
-            L1_3 = addSkill
-            L2_3 = L2_1.addSkill
-            L2_3 = L2_3.skill
-            L3_3 = L2_1.addSkill
-            L3_3 = L3_3.value
-            L3_3 = L3_3 / 10
-            L4_3 = L2_1.addSkill
-            L4_3 = L4_3.skill
-            if "strenght" == L4_3 then
-              L4_3 = strengthBooster
-              if L4_3 then
-                goto lbl_381
-              end
-            end
-            L4_3 = conditionBooster
-            ::lbl_381::
-            L3_3 = L3_3 * L4_3
-            L1_3(L2_3, L3_3)
-          else
-            L1_3 = addSkill
-            L2_3 = L2_1.addSkill
-            L2_3 = L2_3.skill
-            L3_3 = math
-            L3_3 = L3_3.random
-            L4_3 = L2_1.addSkill
-            L4_3 = L4_3.value
-            L4_3 = L4_3[1]
-            L5_3 = L2_1.addSkill
-            L5_3 = L5_3.value
-            L5_3 = L5_3[2]
-            L3_3 = L3_3(L4_3, L5_3)
-            L3_3 = L3_3 / 10
-            L4_3 = L2_1.addSkill
-            L4_3 = L4_3.skill
-            if "strenght" == L4_3 then
-              L4_3 = strengthBooster
-              if L4_3 then
-                goto lbl_407
-              end
-            end
-            L4_3 = conditionBooster
-            ::lbl_407::
-            L3_3 = L3_3 * L4_3
-            L1_3(L2_3, L3_3)
-          end
-        else
-          L1_3 = CL
-          L1_3 = L1_3.Notification
-          L2_3 = TRANSLATE
-          L3_3 = "notify.title.gym"
-          L2_3 = L2_3(L3_3)
-          L3_3 = TRANSLATE
-          L4_3 = "out_of_breath"
-          L3_3 = L3_3(L4_3)
-          L4_3 = 3850
-          L5_3 = "fa-solid fa-dumbbell"
-          L6_3 = "info"
-          L1_3(L2_3, L3_3, L4_3, L5_3, L6_3)
-          L1_3 = Citizen
-          L1_3 = L1_3.Wait
-          L2_3 = 1000
-          L1_3(L2_3)
-        end
-        ::lbl_427::
-      end
-      L0_3 = IsControlJustPressed
-      L1_3 = 0
-      L2_3 = Config
-      L2_3 = L2_3.Keys
-      L2_3 = L2_3.stop
-      L0_3 = L0_3(L1_3, L2_3)
-      if L0_3 then
-        L0_3 = stopAction
-        L0_3()
-      end
-      L0_3 = Citizen
-      L0_3 = L0_3.Wait
-      L1_3 = 1
-      L0_3(L1_3)
-    end
-  end
-  L3_2(L4_2)
-  L3_2 = Citizen
-  L3_2 = L3_2.CreateThread
-  function L4_2()
-    local L0_3, L1_3, L2_3, L3_3
-    while true do
-      L0_3 = L2_1
-      if not L0_3 then
-        break
-      end
-      L0_3 = SendNUIMessage
-      L1_3 = {}
-      L1_3.action = "update"
-      L2_3 = GetPlayerStamina
-      L3_3 = PlayerId
-      L3_3 = L3_3()
-      L2_3 = L2_3(L3_3)
-      L1_3.stamina = L2_3
-      L0_3(L1_3)
-      L0_3 = Citizen
-      L0_3 = L0_3.Wait
-      L1_3 = 800
-      L0_3(L1_3)
-    end
-  end
-  L3_2(L4_2)
-end
-startAction = L8_1
-function stopAction()
-    local ped = PlayerPedId()
-    local activityName = L2_1 and L2_1.name
-    local exitAnim = activityName and Config.Animations[activityName] and Config.Animations[activityName].exit
 
-    -- play exit animation if defined, then force-clear all tasks
-    if exitAnim then
-        TaskPlayAnim(ped, exitAnim[1], exitAnim[2], 8.0, -8.0, exitAnim[3], 0, 0.0, 0, 0, 0)
-        Citizen.Wait(exitAnim[3])
+    SetNuiFocus(true, true)
+
+    if not Config.UseBuildInCompanyBalance then
+        Citizen.Wait(300)
+        TriggerServerEvent(Config.ESXSocietyEvents.check, gymConfig.ownerJob)
     end
-    ClearPedTasksImmediately(ped)
-
-    -- restore ped physics
-    FreezeEntityPosition(ped, false)
-    SetEntityCollision(ped, true, true)
-
-    -- mark spot as free on server
-    TriggerServerEvent("flake_gym:sv:setTaken", L0_1, L1_1, false)
-
-    -- close HUD
-    SendNUIMessage({action = "closeHelpKeys"})
-
-    -- delete attached props
-    if L3_1 then DeleteObject(L3_1) end
-    if L4_1 then DeleteObject(L4_1) end
-
-    -- reset all activity state
-    removeStrength = true
-    L2_1 = nil
-    L1_1 = nil
-    L0_1 = nil
-    L3_1 = nil
-    L4_1 = nil
 end
-function L8_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2
-  L2_2 = TriggerServerEvent
-  L3_2 = "flake_gym:sv:addValue"
-  L4_2 = A0_2
-  L5_2 = A1_2
-  L2_2(L3_2, L4_2, L5_2)
+
+function closeManagementMenu()
+    SendNUIMessage({action = "closeManagementMenu"})
+    currentGymManagement = nil
+    SetNuiFocus(false, false)
 end
-addSkill = L8_1
-L8_1 = exports
-L9_1 = "addSkill"
-L10_1 = addSkill
-L8_1(L9_1, L10_1)
+
+-- ============================================================
+--  Open purchase menu (shop – memberships / proteins)
+-- ============================================================
+function openPurchaseMenu(gymId)
+    if waitingForLoadAfterRestart then return end
+
+    local gymConfig = Config.Gyms[gymId]
+    if not gymConfig then return end
+
+    local msg = {action = "openPurchaseMenu"}
+
+    if gymConfig.requiredMembership and gymConfig.allowBuyMembership then
+        msg.useMemberships   = true
+        msg.membershipsList  = gymConfig.memberships
+        msg.myMembership     = myMemberships[gymConfig.requiredMembership]
+    end
+
+    if gymConfig.allowBuyProteins then
+        msg.useProteins  = true
+        msg.proteinsList = gymConfig.proteins
+    end
+
+    if not gymConfig.allowBuyMembership and not gymConfig.allowBuyProteins then return end
+
+    currentShop = gymId
+    Citizen.Wait(100)
+    SetNuiFocus(true, true)
+    SendNUIMessage(msg)
+end
+
+-- ============================================================
+--  Buy protein (triggered from NUI callback)
+-- ============================================================
+function buyProtein(itemName)
+    if not itemName or not currentShop then return end
+    local gymConfig = Config.Gyms[currentShop]
+    if not gymConfig then return end
+    if not gymConfig.proteins or not gymConfig.allowBuyProteins then return end
+    TriggerServerEvent("flake_gym:sv:buyProtein", currentShop, itemName)
+end
+
+-- ============================================================
+--  Buy membership (triggered from NUI callback)
+-- ============================================================
+function buyMembership(days, hours)
+    if not days and not hours then return end
+    if not currentShop then return end
+
+    local gymConfig = Config.Gyms[currentShop]
+    if not gymConfig then return end
+    if not gymConfig.requiredMembership then return end
+    if not gymConfig.allowBuyMembership then return end
+
+    -- Find the matching membership tier
+    local selectedMembership = nil
+    for _, mem in pairs(gymConfig.memberships) do
+        if mem.days == days and mem.hours == hours then
+            selectedMembership = mem
+            break
+        end
+    end
+
+    TriggerServerEvent("flake_gym:sv:acceptMembership",
+        currentShop,
+        gymConfig.requiredMembership,
+        selectedMembership)
+end
+
+-- ============================================================
+--  Skill functions (exported)
+-- ============================================================
+function addSkill(skillName, value)
+    TriggerServerEvent("flake_gym:sv:addValue", skillName, value)
+end
+exports("addSkill", addSkill)
+
 function getSkillValue(skillName)
     if myStatistics == nil then return 0.0 end
     return myStatistics[skillName] or 0.0
 end
 getSkill = getSkillValue
-L8_1 = exports
-L9_1 = "getSkill"
-L10_1 = getSkill
-L8_1(L9_1, L10_1)
-function L8_1(A0_2, A1_2)
-  local L2_2, L3_2, L4_2, L5_2
-  L2_2 = TriggerServerEvent
-  L3_2 = "flake_gym:sv:removeValue"
-  L4_2 = A0_2
-  L5_2 = A1_2
-  L2_2(L3_2, L4_2, L5_2)
+exports("getSkill", getSkill)
+
+function removeSkill(skillName, value)
+    TriggerServerEvent("flake_gym:sv:removeValue", skillName, value)
 end
-removeSkill = L8_1
-L8_1 = exports
-L9_1 = "removeSkill"
-L10_1 = removeSkill
-L8_1(L9_1, L10_1)
-function L8_1()
-  local L0_2, L1_2, L2_2
-  L0_2 = waitingForLoadAfterRestart
-  if L0_2 then
-    return
-  end
-  L0_2 = SetNuiFocus
-  L1_2 = true
-  L2_2 = true
-  L0_2(L1_2, L2_2)
-  L0_2 = SendNUIMessage
-  L1_2 = {}
-  L1_2.action = "openStatisticsMenu"
-  L2_2 = myStatistics
-  L1_2.stats = L2_2
-  L0_2(L1_2)
+exports("removeSkill", removeSkill)
+
+-- ============================================================
+--  Open statistics menu (exported)
+-- ============================================================
+function openStatisticsMenu()
+    if waitingForLoadAfterRestart then return end
+    SetNuiFocus(true, true)
+    SendNUIMessage({action = "openStatisticsMenu", stats = myStatistics})
 end
-openStatisticsMenu = L8_1
-L8_1 = exports
-L9_1 = "openStatisticsMenu"
-L10_1 = openStatisticsMenu
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "flake_gym:cl:setTaken"
-function L10_1(A0_2, A1_2, A2_2)
-  local L3_2
-  L3_2 = Config
-  L3_2 = L3_2.Gyms
-  L3_2 = L3_2[A0_2]
-  L3_2 = L3_2.points
-  L3_2 = L3_2[A1_2]
-  L3_2.taken = A2_2
+exports("openStatisticsMenu", openStatisticsMenu)
+
+-- ============================================================
+--  /mystats command
+-- ============================================================
+if Config.StatisticCommand and Config.StatisticCommand ~= "" then
+    RegisterCommand(Config.StatisticCommand, function()
+        openStatisticsMenu()
+    end)
+
+    if Config.StatisticKey and Config.StatisticKey ~= "" then
+        RegisterKeyMapping(
+            Config.StatisticCommand,
+            Config.StatisticDescription,
+            "keyboard",
+            Config.StatisticKey)
+    end
 end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "flake_gym:cl:updateStatistic"
-function L10_1(A0_2)
-  local L1_2, L2_2, L3_2
-  myStatistics = A0_2
-  L1_2 = SendNUIMessage
-  L2_2 = {}
-  L2_2.action = "updateStatisticsMenu"
-  L3_2 = myStatistics
-  L2_2.stats = L3_2
-  L1_2(L2_2)
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "flake_gym:runConditionBooster"
-L8_1(L9_1)
-L8_1 = AddEventHandler
-L9_1 = "flake_gym:runConditionBooster"
-function L10_1(A0_2, A1_2)
-  local L2_2, L3_2
-  L2_2 = conditionBooster
-  if 1.0 == L2_2 and A0_2 then
-    L2_2 = tonumber
-    L3_2 = A0_2
-    L2_2 = L2_2(L3_2)
-    if L2_2 and A1_2 then
-      L2_2 = tonumber
-      L3_2 = A1_2
-      L2_2 = L2_2(L3_2)
-      if L2_2 then
-        conditionBooster = A0_2
-        L2_2 = Citizen
-        L2_2 = L2_2.CreateThread
-        function L3_2()
-          local L0_3, L1_3
-          L0_3 = Citizen
-          L0_3 = L0_3.Wait
-          L1_3 = A1_2
-          L0_3(L1_3)
-          conditionBooster = 1.0
+
+-- ============================================================
+--  startAction  –  teleport player to exercise position and
+--                  begin the animation / interaction loop
+-- ============================================================
+function startAction(gymId, pointIdx, pointData)
+    if waitingForLoadAfterRestart then return end
+
+    -- Membership check
+    if Config.EnableMemberships then
+        local gymCfg = Config.Gyms[gymId]
+        if gymCfg and gymCfg.requiredMembership then
+            local hasMembership = myMemberships[gymCfg.requiredMembership]
+            if not hasMembership then
+                -- Employees bypass if AutoMembershipForEmployees is on
+                local isEmployee = Config.AutoMembershipForEmployees
+                    and PlayerData.job
+                    and PlayerData.job.name == gymCfg.ownerJob
+                if not isEmployee then
+                    CL.Notification(
+                        TRANSLATE("notify.title.gym"),
+                        TRANSLATE("no_membership"),
+                        3500,
+                        "fa-solid fa-dumbbell",
+                        "error")
+                    return
+                end
+            end
         end
-        L2_2(L3_2)
-      end
     end
-  end
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "flake_gym:runStrengthBooster"
-L8_1(L9_1)
-L8_1 = AddEventHandler
-L9_1 = "flake_gym:runStrengthBooster"
-function L10_1(A0_2, A1_2)
-  local L2_2, L3_2
-  L2_2 = strengthBooster
-  if 1.0 == L2_2 and A0_2 then
-    L2_2 = tonumber
-    L3_2 = A0_2
-    L2_2 = L2_2(L3_2)
-    if L2_2 and A1_2 then
-      L2_2 = tonumber
-      L3_2 = A1_2
-      L2_2 = L2_2(L3_2)
-      if L2_2 then
-        strengthBooster = A0_2
-        L2_2 = Citizen
-        L2_2 = L2_2.CreateThread
-        function L3_2()
-          local L0_3, L1_3
-          L0_3 = Citizen
-          L0_3 = L0_3.Wait
-          L1_3 = A1_2
-          L0_3(L1_3)
-          strengthBooster = 1.0
+
+    -- Spot must be free
+    if pointData.taken then
+        CL.Notification(
+            TRANSLATE("notify.title.gym"),
+            TRANSLATE("place_taken"),
+            3500,
+            "fa-solid fa-dumbbell",
+            "error")
+        return
+    end
+
+    -- Store activity state
+    currentActivityGymId    = gymId
+    currentActivityPointIdx = pointIdx
+    currentActivityPoint    = pointData
+    removeStrength          = false
+
+    -- Face the right direction
+    if pointData.activityCoord and pointData.activityCoord.w then
+        SetEntityHeading(PlayerPedId(), pointData.activityCoord.w)
+    end
+
+    -- Teleport player to the activity spot
+    local ac = pointData.activityCoord
+    if ac and ac.x and ac.y and ac.z then
+        SetEntityCoords(PlayerPedId(), vec(ac.x, ac.y, ac.z), false, false, false, false)
+    end
+
+    -- Freeze & remove collision so animations don't slide
+    FreezeEntityPosition(PlayerPedId(), true)
+    SetEntityCollision(PlayerPedId(), false, false)
+
+    -- Pre-load all animation dicts for this activity type
+    local animSet = Config.Animations[pointData.name]
+    for _, animData in pairs(animSet) do
+        loadAnimDict(animData[1])
+    end
+
+    -- Mark spot as taken on the server (broadcasts to all clients)
+    TriggerServerEvent("flake_gym:sv:setTaken", gymId, pointIdx, true)
+
+    -- Show HUD with stamina
+    SendNUIMessage({
+        action  = "openHelpKeys",
+        stamina = GetPlayerStamina(PlayerId()),
+    })
+
+    -- Play enter animation if it exists
+    if animSet.enter then
+        TaskPlayAnim(PlayerPedId(),
+            animSet.enter[1], animSet.enter[2],
+            8.0, -8.0, animSet.enter[3],
+            0, 0.0, 0, 0, 0)
+        Citizen.Wait(animSet.enter[3])
+    end
+
+    -- Spawn the activity thread (input loop + idle anim + props)
+    Citizen.CreateThread(function()
+        -- Play idle animation
+        TaskPlayAnim(PlayerPedId(),
+            animSet.idle[1], animSet.idle[2],
+            8.0, -8.0, animSet.idle[3],
+            1, 0.0, 0, 0, 0)
+
+        -- Attach prop1
+        if pointData.prop then
+            requestProp(GetHashKey(pointData.prop.name))
+            local pedCoords = GetEntityCoords(PlayerPedId())
+            local obj = CreateObject(GetHashKey(pointData.prop.name), pedCoords, true, true, true)
+            propHandle1 = obj
+            local boneIdx = GetPedBoneIndex(PlayerPedId(), pointData.prop.attachBone)
+            local p = pointData.prop.placement
+            AttachEntityToEntity(obj, PlayerPedId(), boneIdx,
+                p[1]+0.0, p[2]+0.0, p[3]+0.0,
+                p[4]+0.0, p[5]+0.0, p[6]+0.0,
+                true, true, false, false, 1, true)
+            SetModelAsNoLongerNeeded(obj)
         end
-        L2_2(L3_2)
-      end
-    end
-  end
-end
-L8_1(L9_1, L10_1)
-L8_1 = RegisterNetEvent
-L9_1 = "flake_gym:notification"
-function L10_1(A0_2, A1_2, A2_2, A3_2, A4_2, A5_2)
-  local L6_2, L7_2, L8_2, L9_2, L10_2, L11_2
-  if A5_2 then
-    L6_2 = disabledNotifySkillInfo
-    if 1 == L6_2 then
-      return
-    end
-  end
-  L6_2 = CL
-  L6_2 = L6_2.Notification
-  L7_2 = A0_2
-  L8_2 = A1_2
-  L9_2 = A2_2
-  L10_2 = A3_2
-  L11_2 = A4_2
-  L6_2(L7_2, L8_2, L9_2, L10_2, L11_2)
-end
-L8_1(L9_1, L10_1)
-L8_1 = Config
-L8_1 = L8_1.StatisticCommand
-if L8_1 then
-  L8_1 = Config
-  L8_1 = L8_1.StatisticCommand
-  if "" ~= L8_1 then
-    L8_1 = RegisterCommand
-    L9_1 = Config
-    L9_1 = L9_1.StatisticCommand
-    function L10_1()
-      local L0_2, L1_2
-      L0_2 = openStatisticsMenu
-      L0_2()
-    end
-    L8_1(L9_1, L10_1)
-    L8_1 = Config
-    L8_1 = L8_1.StatisticDescription
-    if L8_1 then
-      L8_1 = Config
-      L8_1 = L8_1.StatisticKey
-      if L8_1 then
-        L8_1 = Config
-        L8_1 = L8_1.StatisticKey
-        if "" ~= L8_1 then
-          L8_1 = RegisterKeyMapping
-          L9_1 = Config
-          L9_1 = L9_1.StatisticCommand
-          L10_1 = Config
-          L10_1 = L10_1.StatisticDescription
-          L11_1 = "keyboard"
-          L12_1 = Config
-          L12_1 = L12_1.StatisticKey
-          L8_1(L9_1, L10_1, L11_1, L12_1)
+
+        -- Attach prop2
+        if pointData.prop2 then
+            requestProp(GetHashKey(pointData.prop2.name))
+            local pedCoords = GetEntityCoords(PlayerPedId())
+            local obj2 = CreateObject(GetHashKey(pointData.prop2.name), pedCoords, true, true, true)
+            propHandle2 = obj2
+            local boneIdx2 = GetPedBoneIndex(PlayerPedId(), pointData.prop2.attachBone)
+            local p2 = pointData.prop2.placement
+            AttachEntityToEntity(obj2, PlayerPedId(), boneIdx2,
+                p2[1]+0.0, p2[2]+0.0, p2[3]+0.0,
+                p2[4]+0.0, p2[5]+0.0, p2[6]+0.0,
+                true, true, false, false, 1, true)
+            SetModelAsNoLongerNeeded(obj2)
         end
-      end
-    end
-  end
+
+        -- Main exercise input loop
+        while currentActivityPoint do
+            -- SPACE = train
+            if IsControlJustPressed(0, Config.Keys.train) then
+                currentStamina = GetPlayerStamina(PlayerId())
+
+                -- Calculate stamina cost based on condition skill
+                local condSkill    = getSkill("condition")
+                local staminaCost
+                if condSkill >= 10.0 then
+                    staminaCost = (pointData.removeStamina * 100) / condSkill
+                else
+                    staminaCost = pointData.removeStamina
+                end
+
+                if currentStamina > staminaCost then
+                    -- Skill check
+                    local failed = false
+                    if Config.UseSkillbar then
+                        Config.Skillbar(pointData.name, function(success)
+                            failed = not success
+                        end)
+                    end
+
+                    if not failed then
+                        -- Progressbar (optional, non-blocking visual)
+                        if Config.UseProgressbar then
+                            Config.Progressbar(pointData.name, animSet.training[3])
+                        end
+
+                        -- Training animation
+                        TaskPlayAnim(PlayerPedId(),
+                            animSet.training[1], animSet.training[2],
+                            8.0, -8.0, animSet.training[3],
+                            0, 0.0, 0, 0, 0)
+                        Citizen.Wait(animSet.training[3])
+
+                        -- Return to idle
+                        TaskPlayAnim(PlayerPedId(),
+                            animSet.idle[1], animSet.idle[2],
+                            8.0, -8.0, animSet.idle[3],
+                            1, 0.0, 0, 0, 0)
+
+                        -- Deduct stamina
+                        SetPlayerStamina(PlayerId(), currentStamina - staminaCost)
+
+                        -- Add skill
+                        if pointData.addSkill and pointData.addSkill.skill and pointData.addSkill.value then
+                            local skillName = pointData.addSkill.skill
+                            local boost     = skillName == "strenght" and strengthBooster or conditionBooster
+                            local gainedVal
+
+                            if type(pointData.addSkill.value) == "number" then
+                                gainedVal = (pointData.addSkill.value / 10) * boost
+                            else
+                                gainedVal = (math.random(pointData.addSkill.value[1], pointData.addSkill.value[2]) / 10) * boost
+                            end
+
+                            addSkill(skillName, gainedVal)
+                        end
+                    end
+                else
+                    -- Out of breath
+                    CL.Notification(
+                        TRANSLATE("notify.title.gym"),
+                        TRANSLATE("out_of_breath"),
+                        3850,
+                        "fa-solid fa-dumbbell",
+                        "info")
+                    Citizen.Wait(1000)
+                end
+            end
+
+            -- X = stop
+            if IsControlJustPressed(0, Config.Keys.stop) then
+                stopAction()
+            end
+
+            Citizen.Wait(1)
+        end
+    end)
+
+    -- Stamina HUD update thread
+    Citizen.CreateThread(function()
+        while currentActivityPoint do
+            SendNUIMessage({action = "update", stamina = GetPlayerStamina(PlayerId())})
+            Citizen.Wait(800)
+        end
+    end)
 end
+startAction = startAction  -- expose globally
+
+-- ============================================================
+--  stopAction  –  end current exercise
+-- ============================================================
+function stopAction()
+    local ped          = PlayerPedId()
+    local activityName = currentActivityPoint and currentActivityPoint.name
+    local exitAnim     = activityName
+        and Config.Animations[activityName]
+        and Config.Animations[activityName].exit
+
+    if exitAnim then
+        TaskPlayAnim(ped, exitAnim[1], exitAnim[2],
+            8.0, -8.0, exitAnim[3], 0, 0.0, 0, 0, 0)
+        Citizen.Wait(exitAnim[3])
+    end
+
+    ClearPedTasksImmediately(ped)
+    FreezeEntityPosition(ped, false)
+    SetEntityCollision(ped, true, true)
+
+    TriggerServerEvent("flake_gym:sv:setTaken", currentActivityGymId, currentActivityPointIdx, false)
+
+    SendNUIMessage({action = "closeHelpKeys"})
+
+    if propHandle1 then DeleteObject(propHandle1) end
+    if propHandle2 then DeleteObject(propHandle2) end
+
+    removeStrength          = true
+    currentActivityPoint    = nil
+    currentActivityPointIdx = nil
+    currentActivityGymId    = nil
+    propHandle1             = nil
+    propHandle2             = nil
+end
+
+-- ============================================================
+--  Passive stat gain / loss threads  (running, driving, etc.)
+-- ============================================================
+local speedUnit    = Config.UnitOfSpeed == 'kmh' and 3.6 or 2.236936
+local removeCondition = true
+
+Citizen.CreateThread(function()
+    while Config.StatisticsMenu["shooting"] do
+        local waiting = 2000
+        Citizen.Wait(waiting)
+        local ped    = PlayerPedId()
+        local status, weapon = GetCurrentPedWeapon(ped, true)
+        if status == 1 and not ({
+            [GetHashKey("weapon_fireextinguisher")] = true,
+            [GetHashKey("weapon_petrolcan")]        = true,
+            [GetHashKey("weapon_hazardcan")]        = true,
+            [GetHashKey("weapon_fertilizercan")]    = true,
+            [GetHashKey("weapon_grenade")]          = true,
+            [GetHashKey("weapon_bzgas")]            = true,
+            [GetHashKey("weapon_molotov")]          = true,
+            [GetHashKey("weapon_stickybomb")]       = true,
+            [GetHashKey("weapon_proxmine")]         = true,
+            [GetHashKey("weapon_snowball")]         = true,
+            [GetHashKey("weapon_pipebomb")]         = true,
+            [GetHashKey("weapon_ball")]             = true,
+            [GetHashKey("weapon_smokegrenade")]     = true,
+            [GetHashKey("weapon_flare")]            = true,
+            [GetHashKey("weapon_rpg")]              = true,
+            [GetHashKey("weapon_grenadelauncher")]  = true,
+            [GetHashKey("weapon_minigun")]          = true,
+            [GetHashKey("weapon_firework")]         = true,
+        })[weapon] then
+            Citizen.Wait(10)
+            if IsPedShooting(ped) and math.random(3) >= 2 then
+                local v = Config.AddStatsValues['Shooting']
+                addSkill("shooting",
+                    type(v) == "number" and v/10.0
+                    or math.random(v[1], v[2])/10.0)
+                Citizen.Wait(math.random(6500, 10000))
+            end
+        end
+    end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(Config.RefreshTimeAddStats)
+        local ped       = PlayerPedId()
+        local vehicle   = GetVehiclePedIsUsing(ped)
+        removeCondition = true
+
+        if IsPedRunning(ped) and Config.StatisticsMenu['condition'] then
+            local v = Config.AddStatsValues['Running']
+            addSkill("condition",
+                (type(v) == "number" and v/10.0 or math.random(v[1], v[2])/10.0) * conditionBooster)
+            removeCondition = false
+
+        elseif IsPedSwimmingUnderWater(ped) and Config.StatisticsMenu['condition'] then
+            local v = Config.AddStatsValues['Swimming']
+            addSkill("condition",
+                (type(v) == "number" and v/10.0 or math.random(v[1], v[2])/10.0) * conditionBooster)
+            removeCondition = false
+
+        elseif DoesEntityExist(vehicle) and GetPedInVehicleSeat(vehicle, -1) == ped then
+            local speed        = GetEntitySpeed(vehicle) * speedUnit
+            local vehicleClass = GetVehicleClass(vehicle)
+
+            if vehicleClass == 13 and speed >= Config.AddStatsValues['Cycling'].minimumSpeed
+                and Config.StatisticsMenu['condition'] then
+                local v = Config.AddStatsValues['Cycling'].value
+                addSkill("condition",
+                    (type(v) == "number" and v/10.0 or math.random(v[1], v[2])/10.0) * conditionBooster)
+                removeCondition = false
+
+            elseif (vehicleClass == 15 or vehicleClass == 16)
+                and speed >= Config.AddStatsValues['Flying'].minimumSpeed
+                and Config.StatisticsMenu['flying'] then
+                local v = Config.AddStatsValues['Flying'].value
+                addSkill("flying",
+                    type(v) == "number" and v/10.0 or math.random(v[1], v[2])/10.0)
+
+            elseif vehicleClass ~= 15 and vehicleClass ~= 16 and vehicleClass ~= 14
+                and speed >= Config.AddStatsValues['Driving'].minimumSpeed
+                and Config.StatisticsMenu['driving'] then
+                local v = Config.AddStatsValues['Driving'].value
+                addSkill("driving",
+                    type(v) == "number" and v/10.0 or math.random(v[1], v[2])/10.0)
+            end
+        end
+
+        -- Apply strength modifier
+        if myStatistics and myStatistics['strenght'] and Config.EnableStrenghtModifier then
+            local s = myStatistics['strenght']
+            if     s >= 70.0 then SetWeaponDamageModifier(GetHashKey("WEAPON_UNARMED"), 2.0)
+            elseif s >= 50.0 then SetWeaponDamageModifier(GetHashKey("WEAPON_UNARMED"), 1.5)
+            elseif s >= 20.0 then SetWeaponDamageModifier(GetHashKey("WEAPON_UNARMED"), 1.25)
+            else                   SetWeaponDamageModifier(GetHashKey("WEAPON_UNARMED"), 1.0)
+            end
+        end
+
+        -- Apply condition modifier
+        if myStatistics and myStatistics['condition'] then
+            local c = myStatistics['condition']
+            if     c >= 70.0 then
+                if Config.EnableRunSpeedModifier  then SetRunSprintMultiplierForPlayer(PlayerId(), 1.49) end
+                if Config.EnableStaminaModifier   then StatSetInt(GetHashKey('MP0_STAMINA'), 60, true) end
+            elseif c >= 50.0 then
+                if Config.EnableRunSpeedModifier  then SetRunSprintMultiplierForPlayer(PlayerId(), 1.35) end
+                if Config.EnableStaminaModifier   then StatSetInt(GetHashKey('MP0_STAMINA'), 30, true) end
+            elseif c >= 20.0 then
+                if Config.EnableRunSpeedModifier  then SetRunSprintMultiplierForPlayer(PlayerId(), 1.1) end
+                if Config.EnableStaminaModifier   then StatSetInt(GetHashKey('MP0_STAMINA'), 15, true) end
+            else
+                if Config.EnableRunSpeedModifier  then SetRunSprintMultiplierForPlayer(PlayerId(), 1.0) end
+                if Config.EnableStaminaModifier   then StatSetInt(GetHashKey('MP0_STAMINA'), 0, true) end
+            end
+        end
+    end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(Config.RefreshTimeRemoveStats)
+        if removeCondition and Config.StatisticsMenu['condition'] and type(removeSkill) == 'function' then
+            local v = Config.RemoveStatsValues['RemoveCondition']
+            removeSkill("condition",
+                type(v) == "number" and v/10.0 or math.random(v[1], v[2])/10.0)
+        end
+        Citizen.Wait(3000)
+        if removeStrength and Config.StatisticsMenu['strenght'] and type(removeSkill) == 'function' then
+            local v = Config.RemoveStatsValues['RemoveStrength']
+            removeSkill("strenght",
+                type(v) == "number" and v/10.0 or math.random(v[1], v[2])/10.0)
+        end
+    end
+end)
+
+-- Driving skill effects
+Citizen.CreateThread(function()
+    while Config.EnableSkillDrivingEffects and Config.StatisticsMenu["driving"] do
+        local veh      = GetVehiclePedIsIn(PlayerPedId(), false)
+        local isDriver = GetPedInVehicleSeat(veh, -1) == PlayerPedId()
+
+        if veh and isDriver and GetEntitySpeed(veh) * speedUnit > Config.SkillDrivingEffectMinimumSpeed then
+            local ds = exports['flake_gym']:getSkill('driving')
+            if ds < 20.0 then
+                SetVehicleSteerBias(veh, math.random(-1, 1) + 0.0)
+                SetVehicleReduceGrip(veh, true)
+                Citizen.Wait(math.random(200, 450))
+                SetVehicleReduceGrip(veh, false)
+                Citizen.Wait(math.random(1750, 3000))
+            elseif ds < 50.0 then
+                local bias = (math.random(-7, 7) + 0.0) / 10
+                SetVehicleSteerBias(veh, bias)
+                if math.abs(GetVehicleSteeringAngle(veh)) > 30.0 then
+                    SetVehicleReduceGrip(veh, true)
+                    Citizen.Wait(math.random(200, 450))
+                    SetVehicleReduceGrip(veh, false)
+                end
+                Citizen.Wait(math.random(1750, 4000))
+            elseif ds < 70.0 then
+                SetVehicleSteerBias(veh, (math.random(-5, 5) + 0.0) / 10)
+                Citizen.Wait(math.random(2000, 6000))
+            elseif ds < 80.0 then
+                SetVehicleSteerBias(veh, (math.random(-2, 2) + 0.0) / 10)
+                Citizen.Wait(math.random(5000, 8000))
+            end
+        end
+
+        Citizen.Wait(500)
+    end
+end)
+
+-- ============================================================
+--  Initialise blips, targets, and proximity loop
+-- ============================================================
+Citizen.CreateThread(function()
+    Citizen.Wait(250)
+
+    -- Add map blips
+    for _, gymConfig in pairs(Config.Gyms) do
+        if gymConfig.blipCoords and gymConfig.blipEnabled then
+            local blip = AddBlipForCoord(gymConfig.blipCoords)
+            SetBlipSprite(blip, Config.Blip.Sprite)
+            SetBlipDisplay(blip, Config.Blip.Display)
+            SetBlipScale(blip, Config.Blip.Scale)
+            SetBlipColour(blip, Config.Blip.Color)
+            SetBlipAsShortRange(blip, true)
+            BeginTextCommandSetBlipName("STRING")
+            AddTextComponentString(gymConfig.blipName)
+            EndTextCommandSetBlipName(blip)
+            gymConfig._createdBlip = blip
+        end
+    end
+
+    -- Load ox_lib if needed
+    local useOxLib = (Config.UseTarget and Config.TargetResource == "ox_target") or Config.Menu == "ox_lib"
+    if useOxLib then
+        local code = LoadResourceFile("ox_lib", "init.lua")
+        assert(load(code, "@@ox_lib/init.lua"))()
+    end
+
+    -- Register targets for each gym
+    if Config.UseTarget then
+        for gymId, gymConfig in pairs(Config.Gyms) do
+            -- Boss menu target
+            if gymConfig.business and gymConfig.ownerJob and gymConfig.bossMenu then
+                CL.Target({
+                    name   = "bossmenu",
+                    coords = gymConfig.bossMenu.targetCoords,
+                    size   = gymConfig.bossMenu.targetSize,
+                    job    = gymConfig.ownerJob,
+                    label  = TRANSLATE("target.boss_menu"),
+                    icon   = "fa-solid fa-dollar-sign",
+                }, function()
+                    openBossMenu(gymId)
+                end)
+            end
+
+            -- Shop menu target
+            if gymConfig.shopMenu then
+                local hasShop = (gymConfig.allowBuyMembership and gymConfig.requiredMembership)
+                    or gymConfig.allowBuyProteins
+                if hasShop then
+                    CL.Target({
+                        name   = "shopmenu",
+                        coords = gymConfig.shopMenu.targetCoords,
+                        size   = gymConfig.shopMenu.targetSize,
+                        label  = TRANSLATE("target.shop_menu"),
+                        icon   = "fa-solid fa-dollar-sign",
+                    }, function()
+                        openPurchaseMenu(gymId)
+                    end)
+                end
+            end
+
+            -- Exercise point targets
+            for pointIdx, point in pairs(gymConfig.points) do
+                CL.Target({
+                    name   = point.name,
+                    coords = point.activityCoord,
+                    size   = point.targetSize,
+                    label  = TRANSLATE("target." .. point.name),
+                    icon   = "fa-solid fa-dumbbell",
+                }, function()
+                    startAction(gymId, pointIdx, point)
+                end)
+            end
+        end
+    end
+end)
+
+-- ============================================================
+--  Proximity loop (no-target mode: markers, 3D text, key prompts)
+-- ============================================================
+Citizen.CreateThread(function()
+    if Config.UseTarget then return end  -- skip if using target system
+
+    local textUIShowing = false
+    local textUIText    = nil
+
+    while true do
+        local sleeping  = true
+        local showText  = nil
+        local myPed     = PlayerPedId()
+        local myCoords  = GetEntityCoords(myPed)
+
+        for gymId, gymConfig in pairs(Config.Gyms) do
+            local distToGym = #(myCoords - gymConfig.blipCoords)
+
+            if distToGym < 45.0 then
+                sleeping = false
+
+                -- Exercise points
+                for pointIdx, point in pairs(gymConfig.points) do
+                    if not point.taken then
+                        local distToPoint = #(myCoords - vec(point.position.x, point.position.y, point.position.z))
+
+                        if distToPoint < Config.DistanceView then
+                            if Config.UseMarkers then
+                                local m = Config.Markers.FreeSeat
+                                DrawMarker(m.id,
+                                    vec(point.position.x, point.position.y, point.position.z),
+                                    0, 0, 0,
+                                    m.rotation[1], m.rotation[2], m.rotation[3],
+                                    m.size,
+                                    m.color[1], m.color[2], m.color[3], m.color[4],
+                                    m.bobUpAndDown, false, false, m.rotate,
+                                    false, false, false)
+                            end
+
+                            if Config.Use3DText then
+                                DrawText3D(point.position.x, point.position.y, point.position.z,
+                                    TRANSLATE("3dtext." .. point.name))
+                            end
+
+                            if distToPoint < 1.25 then
+                                showText = TRANSLATE("textui." .. point.name)
+
+                                if Config.Core == "ESX" and not CL.TextUI.Enabled and Config.UseHelpNotify then
+                                    ESX.ShowHelpNotification(TRANSLATE("help." .. point.name))
+                                end
+
+                                if IsControlJustPressed(0, Config.Keys.enter) then
+                                    startAction(gymId, pointIdx, point)
+                                    showText = nil
+                                end
+                            end
+                        end
+                    end
+                end
+
+                -- Boss menu
+                if gymConfig.business and gymConfig.bossMenu and gymConfig.bossMenu.coords then
+                    local distToBoss = #(myCoords - gymConfig.bossMenu.coords.xyz)
+
+                    if distToBoss < Config.DistanceView and PlayerData and PlayerData.job then
+                        if CL.IsEmployee(gymConfig.ownerJob) then
+                            sleeping = false
+                            if Config.UseMarkers then
+                                local m = Config.Markers.BossMenu
+                                DrawMarker(m.id, gymConfig.bossMenu.coords.xyz,
+                                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                    m.size,
+                                    m.color[1], m.color[2], m.color[3], m.color[4],
+                                    m.bobUpAndDown, false, false, m.rotate,
+                                    false, false, false)
+                            end
+
+                            if Config.Use3DText then
+                                DrawText3D(gymConfig.bossMenu.coords.x, gymConfig.bossMenu.coords.y,
+                                    gymConfig.bossMenu.coords.z, TRANSLATE("3dtext.boss_menu"))
+                            end
+
+                            if distToBoss < Config.DistanceAccess then
+                                showText = TRANSLATE("textui.boss_menu")
+
+                                if Config.Core == "ESX" and not CL.TextUI.Enabled and Config.UseHelpNotify then
+                                    ESX.ShowHelpNotification(TRANSLATE("help.boss_menu"))
+                                end
+
+                                if IsControlJustPressed(0, 38) then
+                                    openBossMenu(gymId)
+                                    showText = nil
+                                end
+                            end
+                        end
+                    end
+                end
+
+                -- Shop menu
+                if gymConfig.shopMenu and gymConfig.shopMenu.coords then
+                    local allowShop = gymConfig.allowBuyMembership or gymConfig.allowBuyProteins
+                    if allowShop then
+                        local distToShop = #(myCoords - gymConfig.shopMenu.coords.xyz)
+
+                        if distToShop < Config.DistanceView then
+                            sleeping = false
+                            if Config.UseMarkers then
+                                local m = Config.Markers.ShopMenu
+                                DrawMarker(m.id, gymConfig.shopMenu.coords.xyz,
+                                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                    m.size,
+                                    m.color[1], m.color[2], m.color[3], m.color[4],
+                                    m.bobUpAndDown, false, false, m.rotate,
+                                    false, false, false)
+                            end
+
+                            if distToShop < Config.DistanceAccess then
+                                showText = TRANSLATE("textui.shop_menu")
+
+                                if Config.Core == "ESX" and not CL.TextUI.Enabled and Config.UseHelpNotify then
+                                    ESX.ShowHelpNotification(TRANSLATE("help.shop_menu"))
+                                end
+
+                                if IsControlJustPressed(0, 38) then
+                                    openPurchaseMenu(gymId)
+                                    showText = nil
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        -- TextUI open/close
+        if CL.TextUI.Enabled then
+            if showText and not textUIShowing then
+                textUIShowing = true
+                textUIText    = showText
+                CL.TextUI.Open(showText)
+            elseif not showText and textUIShowing then
+                textUIShowing = false
+                textUIText    = nil
+                CL.TextUI.Close()
+            end
+        end
+
+        Citizen.Wait(sleeping and 2000 or 1)
+    end
+end)
