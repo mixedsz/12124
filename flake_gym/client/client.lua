@@ -2553,13 +2553,11 @@ L8_1 = exports
 L9_1 = "addSkill"
 L10_1 = addSkill
 L8_1(L9_1, L10_1)
-function L8_1(A0_2)
-  local L1_2
-  L1_2 = myStatistics
-  L1_2 = L1_2[A0_2]
-  return L1_2
+function getSkillValue(skillName)
+    if myStatistics == nil then return 0.0 end
+    return myStatistics[skillName] or 0.0
 end
-getSkill = L8_1
+getSkill = getSkillValue
 L8_1 = exports
 L9_1 = "getSkill"
 L10_1 = getSkill
